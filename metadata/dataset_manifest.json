@@ -1,0 +1,64 @@
+{
+  "collection": "CalibForge, DeepSeek Thinking High, six tools",
+  "planned_tasks": 1000,
+  "recorded_tasks": 932,
+  "official_reward1": 704,
+  "official_reward0": 214,
+  "official_unscored": 82,
+  "source_complete_text_trajectories": 691,
+  "source_length_excluded": 1,
+  "max_len": 262144,
+  "truncation": false,
+  "published_rows": {
+    "trajectories.jsonl": 674,
+    "train.processed.jsonl": 638,
+    "holdout.processed.jsonl": 35
+  },
+  "assistant_targets": {
+    "train.processed.jsonl": 16999,
+    "holdout.processed.jsonl": 1070
+  },
+  "credential_candidate_tasks_excluded": [
+    "debugging_20260415_123352_005",
+    "file-operations_20260422_235124_005",
+    "file-operations_20260508_153434_001",
+    "file-operations_20260513_204744_002",
+    "file-operations_20260602_105139_004",
+    "security_20260419_112101_007",
+    "security_20260419_182351_003",
+    "security_20260422_235124_002",
+    "security_20260508_045740_007",
+    "security_20260509_202829_005",
+    "security_20260510_005520_006",
+    "security_20260510_053611_006",
+    "security_20260510_142854_006",
+    "security_20260511_015840_001",
+    "security_20260604_144210_005",
+    "security_20260606_172554_005",
+    "security_20260606_172606_005"
+  ],
+  "raw_format": "task_id, trial_uuid, input (OpenAI messages), tools (per-trajectory function schemas)",
+  "processed_format": "SWE-Master prompt/response/response_ranges, with identity and token count",
+  "model": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "benchmark": "https://huggingface.co/datasets/AweAI-Team/CalibForge",
+  "benchmark_revision": "c2fae4c1f536461142b2a89a8b9423a8bc376088",
+  "SWE_Master": "https://github.com/RUCAIBox/SWE-Master/tree/bc8904f44d62f10b5eb16189b22eca31e20cd48e",
+  "tokenizer_runtime": {
+    "transformers": "5.8.0",
+    "tokenizers": "0.22.2",
+    "class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
+  },
+  "tokenizer_reload_render_and_token_count_verified_rows": 673,
+  "native_training_text_rule": "rendered.rstrip(newline); append space+tokenizer.eos_token if absent, matching SWE-Master Dataset",
+  "source_data_sha256": {
+    "qualified.jsonl": "3f94c6b1fc6b70bf1f50a08fd497dfbd9ccee256501ec217ed2f347c24b90d19",
+    "train.processed.jsonl": "3749030c2c3ce469a3334cba3b9142d155057baf1ab71f5993766e4f0050231a",
+    "holdout.processed.jsonl": "e68552230d13ee9a556c92dda505cf29900b32ca4dce526e231f242a84966608"
+  },
+  "data_sha256": {
+    "holdout.processed.jsonl": "e68552230d13ee9a556c92dda505cf29900b32ca4dce526e231f242a84966608",
+    "train.processed.jsonl": "19382230e955054bddfa976edebcf4503a254581373a68bb7083c19af7cf304d",
+    "trajectories.jsonl": "f465a4ea8dd7587477e375b2942ecc71c83330fc6e380ea43a0088726aad67b7"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 18657,
+      "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+    },
+    {
+      "path": "LICENSES/Qwen3.5-4B-LICENSE.txt",
+      "bytes": 11343,
+      "sha256": "50cbab8a892c5f2993b8c7351a99182507472def3b1374558308605d99b86b32"
+    },
+    {
+      "path": "LICENSES/SWE-Master-MIT.txt",
+      "bytes": 1069,
+      "sha256": "e3130ed03f189be6075ea0c69496b0cdb8cbbf929df88f82877692a76ea12c88"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4674,
+      "sha256": "bdc4c41c301e7f6e233406d79e3f30ccb162cb01f060dbd6f63cb952d079ee69"
+    },
+    {
+      "path": "data/holdout.processed.jsonl",
+      "bytes": 5872737,
+      "sha256": "e68552230d13ee9a556c92dda505cf29900b32ca4dce526e231f242a84966608"
+    },
+    {
+      "path": "data/train.processed.jsonl",
+      "bytes": 83000281,
+      "sha256": "19382230e955054bddfa976edebcf4503a254581373a68bb7083c19af7cf304d"
+    },
+    {
+      "path": "data/trajectories.jsonl",
+      "bytes": 90140561,
+      "sha256": "f465a4ea8dd7587477e375b2942ecc71c83330fc6e380ea43a0088726aad67b7"
+    },
+    {
+      "path": "metadata/SECURITY_SCAN.json",
+      "bytes": 1488,
+      "sha256": "36ca298c5785546c702bfed4eb4f24257c1954f3712a39de6cfc6f74d31c6fcf"
+    },
+    {
+      "path": "metadata/dataset_manifest.json",
+      "bytes": 2765,
+      "sha256": "90406e2ea74b6bef5dba625032b84403a1dd66819b497688de40ec1f07ed37b4"
+    },
+    {
+      "path": "metadata/split.json",
+      "bytes": 29312,
+      "sha256": "21c8a7c60bb2f4f871bfd328e9e6bfec9ed88264c9d701a147c06013e2d564bc"
+    },
+    {
+      "path": "preprocessing/sft_data_pre_tokenize_toolcall.py",
+      "bytes": 17377,
+      "sha256": "df0f9770ad6d839dace154eeb0c18fc8a2136012e3cdfac10381c22e27bd16e6"
+    },
+    {
+      "path": "requirements-tokenizer.txt",
+      "bytes": 39,
+      "sha256": "ef71c268be7fe7de11671ddcfedd2a99e97540ebbb05f3903370b1ac28db995d"
+    },
+    {
+      "path": "tokenizer/chat_template.jinja",
+      "bytes": 7756,
+      "sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+    },
+    {
+      "path": "tokenizer/tokenizer.json",
+      "bytes": 19989343,
+      "sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4"
+    },
+    {
+      "path": "tokenizer/tokenizer_config.json",
+      "bytes": 1126,
+      "sha256": "24736c3df221b0d3d47564d3f472709d538afa8747a814982ab562f2ce45edcc"
+    }
+  ]
+}

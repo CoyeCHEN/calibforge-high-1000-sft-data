@@ -1,0 +1,51 @@
+{
+  "status": "PASSED",
+  "secret_values_recorded": false,
+  "checks": [
+    "aws_access_key",
+    "bearer_value",
+    "e2b_token",
+    "github_token",
+    "huggingface_token",
+    "named_credential",
+    "private_key",
+    "provider_key",
+    "provided_credential_literals"
+  ],
+  "scanned_files": [
+    "LICENSE",
+    "LICENSES/Qwen3.5-4B-LICENSE.txt",
+    "LICENSES/SWE-Master-MIT.txt",
+    "README.md",
+    "data/holdout.processed.jsonl",
+    "data/train.processed.jsonl",
+    "data/trajectories.jsonl",
+    "metadata/dataset_manifest.json",
+    "metadata/split.json",
+    "preprocessing/sft_data_pre_tokenize_toolcall.py",
+    "requirements-tokenizer.txt",
+    "tokenizer/chat_template.jinja",
+    "tokenizer/tokenizer.json",
+    "tokenizer/tokenizer_config.json"
+  ],
+  "candidate_tasks_excluded": [
+    "debugging_20260415_123352_005",
+    "file-operations_20260422_235124_005",
+    "file-operations_20260508_153434_001",
+    "file-operations_20260513_204744_002",
+    "file-operations_20260602_105139_004",
+    "security_20260419_112101_007",
+    "security_20260419_182351_003",
+    "security_20260422_235124_002",
+    "security_20260508_045740_007",
+    "security_20260509_202829_005",
+    "security_20260510_005520_006",
+    "security_20260510_053611_006",
+    "security_20260510_142854_006",
+    "security_20260511_015840_001",
+    "security_20260604_144210_005",
+    "security_20260606_172554_005",
+    "security_20260606_172606_005"
+  ],
+  "remaining_candidate_matches": 0
+}
