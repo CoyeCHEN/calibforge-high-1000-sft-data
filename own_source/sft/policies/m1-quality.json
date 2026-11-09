@@ -1,0 +1,688 @@
+{
+  "dataset": "NiuNiu0110/TMax-Agent-SFT-terminus",
+  "revision": "7d74fd38a3bc437bbd2c377bd8a1effba64d79ba",
+  "source_sha256": {
+    "train": "50e4065a55fb9364c8346329037571f88bb5c258a82d6f064ff2b5b2ce91519f",
+    "holdout": "ecb9545bca890d8c690d0918988427d282120ae6f9a29954b1fea17fef89d3f5"
+  },
+  "exclusions": [
+    {
+      "split": "train",
+      "trajectory": "task_000005_a72a26b5__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000011_d089ef35__sol0",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000011_d089ef35__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000018_bbf7750d__sol5",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000148_72446a8b__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000148_72446a8b__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000148_72446a8b__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000148_72446a8b__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000194_4bc63c66__sol3",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000195_8c49f546__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000200_f0dc5370__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000204_0d4a010f__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000214_5188b6ff__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000214_5188b6ff__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000214_5188b6ff__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000214_5188b6ff__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000265_2a58a90e__sol1",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000275_58b18839__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000275_58b18839__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000275_58b18839__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000275_58b18839__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000275_58b18839__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000275_58b18839__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000294_4c3517a1__sol0",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000322_c54cf3b5__sol5",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000353_cbf207bd__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000369_0e4f9f88__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000412_9ff5e23a__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000413_bfe94063__sol3",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000430_3d989e30__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000447_3d85bfd9__sol5",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000459_830953a4__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000478_23bb3e5c__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000478_23bb3e5c__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000478_23bb3e5c__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000478_23bb3e5c__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000478_23bb3e5c__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000478_23bb3e5c__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000492_9ccc17e2__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000499_1b3cb323__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000499_1b3cb323__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000499_1b3cb323__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000499_1b3cb323__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000499_1b3cb323__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000551_f7b746fa__sol3",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000576_1cc88710__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000610_1e3015cb__sol5",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000639_edcf7488__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000642_d306ca04__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000642_d306ca04__sol3",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000642_d306ca04__sol7",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000653_c2031c74__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000653_c2031c74__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000653_c2031c74__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000653_c2031c74__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000653_c2031c74__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000654_46fa872d__sol7",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000661_f26aec97__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000700_3627f7c5__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000740_59416444__sol2",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000833_49f24a57__sol7",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000859_60ab755f__sol1",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000909_63570d85__sol5",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000932_6438cec4__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000939_1592be48__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000939_1592be48__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000939_1592be48__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_000957_fa05260e__sol5",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001119_3ad3e8f1__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001164_c08d2e92__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001164_c08d2e92__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001178_1ee99ef9__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001178_1ee99ef9__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001178_1ee99ef9__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001178_1ee99ef9__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001178_1ee99ef9__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001178_1ee99ef9__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001207_44e97fe1__sol3",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001225_c67f2f67__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001225_c67f2f67__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001225_c67f2f67__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001225_c67f2f67__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001313_19297c0a__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001313_19297c0a__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001335_4532043d__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001335_4532043d__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001335_4532043d__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001335_4532043d__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001391_c320a074__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001442_474ea40a__sol0",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001475_a8b9ff53__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001498_df8254c9__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001510_15701f98__sol3",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001642_0ae7ac28__sol7",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001682_2e1b8b54__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001682_2e1b8b54__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001682_2e1b8b54__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001682_2e1b8b54__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001720_2d32f671__sol0",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001828_ad2c6844__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001903_661cbfee__sol1",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_001953_b20addb3__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002022_f4de27cc__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol5",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol6",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002064_074dcdb9__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002094_d9dbf3c5__sol0",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "train",
+      "trajectory": "task_002124_85cbca60__sol0",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000792_abd218c8__sol4",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000792_abd218c8__sol7",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000465_783f2edc__sol6",
+      "reason": "QUARANTINE_EXISTING_MARKUP_WARNING"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000189_24d5d508__sol0",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000189_24d5d508__sol1",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000189_24d5d508__sol2",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000189_24d5d508__sol3",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000189_24d5d508__sol4",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    },
+    {
+      "split": "validation",
+      "trajectory": "task_000189_24d5d508__sol7",
+      "reason": "REUSE_HISTORICAL_QUALITY_EXCLUSION"
+    }
+  ],
+  "expected_rows": {
+    "train": 5320,
+    "validation": 191
+  },
+  "expected_supervised_tokens": {
+    "train": 18250947,
+    "validation": 630176
+  }
+}

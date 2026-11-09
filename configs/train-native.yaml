@@ -1,0 +1,46 @@
+# Whole-trajectory configuration of the same upstream-native branch.
+# One raw provider decision per row; same recipe applies to MAX and OFF data.
+# Use export_teacher_lf.py to preserve fields through native ShareGPT.
+# Native labels/step grouping and default loss weighting differ from history.
+# Full CPU data passed; four real rows passed one partial-GA1 capacity update.
+# Full GA8/epoch remains untested; native allocator setting is required by recipe.
+model_name_or_path: Qwen/Qwen3.5-4B
+model_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+stage: sft
+do_train: true
+finetuning_type: full
+freeze_vision_tower: true
+freeze_multi_modal_projector: true
+freeze_language_model: false
+template: qwen3_5
+dataset: calibforge_high_train
+eval_dataset: calibforge_high_validation
+do_eval: false
+dataset_dir: data
+tokenized_path: data/lf-cache
+output_dir: outputs/calibforge-high-native
+cutoff_len: 262144
+packing: false
+mask_history: false
+enable_thinking: true
+preserve_thinking: true
+bf16: true
+optim: adamw_torch
+gradient_checkpointing: true
+use_reentrant_gc: false
+seed: 42
+data_seed: 42
+flash_attn: fa2
+enable_liger_kernel: true
+deepspeed: configs/native-ds.json
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-5
+num_train_epochs: 1.0
+lr_scheduler_type: cosine_with_min_lr
+lr_scheduler_kwargs:
+  min_lr_rate: 0.1
+warmup_ratio: 0.05
+logging_steps: 1
+save_strategy: epoch
+report_to: none

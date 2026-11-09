@@ -1,0 +1,30 @@
+--- a/studies/native_lf/ci-native.yaml
++++ b/studies/native_lf/ci-native.yaml
+@@ -24,7 +24,11 @@
+ seed: 42
+ data_seed: 42
+ flash_attn: fa2
+-enable_liger_kernel: true
++enable_liger_kernel: false
++use_liger_kernel: true
++liger_kernel_config:
++  rms_norm: false
++  swiglu: false
+ deepspeed: examples/deepspeed/ds_z3_config.json
+ per_device_train_batch_size: 1
+ gradient_accumulation_steps: 8
+--- a/studies/native_lf/teacher-decision-native.yaml
++++ b/studies/native_lf/teacher-decision-native.yaml
+@@ -27,7 +27,11 @@
+ seed: 42
+ data_seed: 42
+ flash_attn: fa2
+-enable_liger_kernel: true
++enable_liger_kernel: false
++use_liger_kernel: true
++liger_kernel_config:
++  rms_norm: false
++  swiglu: false
+ deepspeed: /path/to/teacher-native-ds.json
+ per_device_train_batch_size: 1
+ gradient_accumulation_steps: 8

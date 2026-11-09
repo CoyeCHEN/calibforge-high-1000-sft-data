@@ -1,0 +1,38 @@
+{
+  "versions": {
+    "llamafactory": "0.9.6.dev0",
+    "transformers": "5.8.0",
+    "torch": "2.8.0",
+    "deepspeed": "0.19.8",
+    "accelerate": "1.11.0",
+    "datasets": "4.0.0",
+    "flash-attn": "2.8.3",
+    "causal-conv1d": "1.6.0",
+    "flash-linear-attention": "0.5.2",
+    "liger-kernel": "0.8.4",
+    "triton": "3.4.0"
+  },
+  "LF_commit": "c683e59edd8f893abc5e1403184a1d0644817d2a",
+  "torch_CUDA_build": "12.8",
+  "torch_cxx11_abi": true,
+  "model": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+  "openharness_repository": "RUCAIBox/open-harness2",
+  "openharness_commit": "4b136692905ba5818620f99d55a7d9d77f2c0b9a",
+  "openharness_live_main": "23636e329521746e7632a020fce045967c24aec5",
+  "openharness_tree": "04fdbd939c8acc921fc50894a486d72c241151a8",
+  "harbor_commit": "ad898548b1a61e93900df35893a3547e05af9d0a",
+  "dataset": "NiuNiu0110/TMax-Agent-SFT-terminus",
+  "dataset_revision": "7d74fd38a3bc437bbd2c377bd8a1effba64d79ba",
+  "language_trainable_parameters": 4205751296,
+  "visual_trainable_parameters": 0,
+  "LF_runtime_files_match_frozen_archive": {
+    "data/loader.py": "f5f59ae8dcb65f95f16052d3c79645adbb02304ba3425682036a41728d0340d0",
+    "data/collator.py": "d9c0c4d5583001c9e2f9825de7dbf2f57cd7c724d0b3c70b4e9cd61cda08edb2",
+    "data/processor/supervised.py": "f1b4b8db32179f7471e7c0bf45806533f8cabe8ade98d3a6b427d80a94b959cf",
+    "hparams/parser.py": "7448e98f3a1c4578c750b12c533d7074a2d2954d60be2440ad897deeb748244f",
+    "model/model_utils/liger_kernel.py": "51f0b7196857d5dddcb229f9145bd452cb685f249ff72c0e431b3f0c5a70cfe7",
+    "train/sft/workflow.py": "aaa1f92b66c4985fe1c1d47a6c28831a1cd0b107d77e3819c2ea174e37a1384b"
+  }
+}

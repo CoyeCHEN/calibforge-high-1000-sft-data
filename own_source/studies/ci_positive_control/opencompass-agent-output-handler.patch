@@ -1,0 +1,23 @@
+--- a/opencompass/openicl/icl_inferencer/icl_agent_inferencer.py
++++ b/opencompass/openicl/icl_inferencer/icl_agent_inferencer.py
+@@ -8,7 +8,7 @@
+ from opencompass.registry import ICL_INFERENCERS
+ 
+ from ..utils.logging import get_logger
+-from .icl_base_inferencer import dump_results_dict
++from .icl_base_inferencer import ChatOutputHandler, dump_results_dict
+ from .icl_chat_inferencer import ChatInferencer
+ 
+ logger = get_logger(__name__)
+@@ -16,10 +16,10 @@
+ 
+ 
+-class AgentInferencerOutputHandler:
++class AgentInferencerOutputHandler(ChatOutputHandler):
+ 
+     def __init__(self) -> None:
+-        self.results_dict = {}
++        super().__init__()
+ 
+     def write_to_json(self, save_dir: str, filename: str):
+         """Dump the result to a json file."""

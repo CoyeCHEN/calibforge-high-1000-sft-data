@@ -1,0 +1,67 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "json",
+  "dataset_size": 5596054,
+  "description": "",
+  "download_checksums": {
+    "/ssd/chenkeyi/calibforge-high-native-lf-public-20261109/bundle/data/validation.sharegpt.jsonl": {
+      "num_bytes": 5857943,
+      "checksum": null
+    }
+  },
+  "download_size": 5857943,
+  "features": {
+    "input_ids": {
+      "feature": {
+        "dtype": "int32",
+        "_type": "Value"
+      },
+      "_type": "List"
+    },
+    "attention_mask": {
+      "feature": {
+        "dtype": "int8",
+        "_type": "Value"
+      },
+      "_type": "List"
+    },
+    "labels": {
+      "feature": {
+        "dtype": "int64",
+        "_type": "Value"
+      },
+      "_type": "List"
+    },
+    "images": {
+      "dtype": "null",
+      "_type": "Value"
+    },
+    "videos": {
+      "dtype": "null",
+      "_type": "Value"
+    },
+    "audios": {
+      "dtype": "null",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 11453997,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 5596054,
+      "num_examples": 35,
+      "dataset_name": "json"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

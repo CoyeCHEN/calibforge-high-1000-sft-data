@@ -1,0 +1,6 @@
+{
+  "before": "Native qwen3_5 MM plugin interprets literal <image> in text-only tool feedback as a missing image and raises ValueError.",
+  "minimum_fix": "Use LF native IMAGE_PLACEHOLDER/VIDEO_PLACEHOLDER/AUDIO_PLACEHOLDER environment configuration; source text and LF code are unchanged.",
+  "native_interface": "llamafactory/extras/constants.py:24,52,142",
+  "after": "RESULT.json records the environment; all673 rows must pass. GPU forward/update remains untested."
+}

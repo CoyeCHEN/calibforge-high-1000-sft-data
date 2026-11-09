@@ -1,0 +1,11 @@
+{
+  "before": {
+    "native_cache_train_rows": 134,
+    "native_cache_validation_rows": 10,
+    "expected_train_rows": 638,
+    "expected_validation_rows": 35,
+    "failure": "LF rejects trajectories ending in observation; exact native cache/source row-count assertion failed"
+  },
+  "minimum_fix": "Remove only tool feedback after the last real assistant decision before calling the unchanged own thin exporter.",
+  "after": "See RESULT.json: all673 rows, every real assistant target retained; no truncation."
+}

@@ -1,0 +1,13 @@
+# CPU integration tests only; not the A800 training environment.
+-c train-cu128.lock
+torch==2.8.0+cpu
+torchvision==0.23.0+cpu
+torchaudio==2.8.0+cpu
+PyYAML==6.0.3
+transformers==5.8.0
+datasets==4.0.0
+accelerate==1.11.0
+deepspeed==0.19.8
+liger-kernel==0.8.4
+triton==3.4.0
+llamafactory @ git+https://github.com/hiyouga/LLaMA-Factory.git@c683e59edd8f893abc5e1403184a1d0644817d2a

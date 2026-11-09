@@ -1,0 +1,37 @@
+# Clean pinned LF baseline, not token/label equivalent to the historical cache.
+# Run from the clean LF checkout; override paths using native CLI key=value.
+model_name_or_path: /data/models/Qwen/Qwen3.5-4B
+model_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+stage: sft
+do_train: true
+finetuning_type: full
+freeze_vision_tower: true
+freeze_multi_modal_projector: true
+freeze_language_model: false
+template: qwen3_5
+dataset: real
+dataset_dir: /path/to/new-ci-raw-data
+output_dir: /path/to/new-ci-native-output
+cutoff_len: 32768
+packing: false
+mask_history: false
+enable_thinking: false
+preserve_thinking: false
+bf16: true
+optim: adamw_torch
+gradient_checkpointing: true
+use_reentrant_gc: false
+seed: 42
+data_seed: 42
+flash_attn: fa2
+enable_liger_kernel: true
+deepspeed: examples/deepspeed/ds_z3_config.json
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-5
+num_train_epochs: 2.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+logging_steps: 1
+save_strategy: epoch
+report_to: none

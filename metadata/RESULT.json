@@ -1,0 +1,45 @@
+{
+  "pipeline": "own ShareGPT thin conversion -> unmodified pinned LF native data processor",
+  "lf_commit": "c683e59edd8f893abc5e1403184a1d0644817d2a",
+  "template": "qwen3_5",
+  "enable_thinking": true,
+  "preserve_thinking": true,
+  "mask_history": false,
+  "row_unit": "one whole trajectory; all assistant targets supervised once",
+  "summary": {
+    "train": {
+      "rows": 638,
+      "input_tokens": 25330274,
+      "supervised_tokens": 14357023,
+      "targets": 16999,
+      "max_length": 232011
+    },
+    "validation": {
+      "rows": 35,
+      "input_tokens": 1748018,
+      "supervised_tokens": 1025918,
+      "targets": 1070,
+      "max_length": 144043
+    }
+  },
+  "untruncated_native_reference_all_rows_equal": true,
+  "SWE_Master_preprocessing_used": false,
+  "teacher_segments_used": false,
+  "versions": {
+    "torch": "2.8.0",
+    "transformers": "5.8.0",
+    "tokenizers": "0.22.2",
+    "datasets": "4.0.0",
+    "accelerate": "1.11.0",
+    "peft": "0.18.1",
+    "trl": "0.24.0"
+  },
+  "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer",
+  "cuda_initialized": false,
+  "scope": "CPU data/cache only; no backbone forward, training or evaluation",
+  "native_media_placeholder_environment": {
+    "IMAGE_PLACEHOLDER": "<|lf_image_input|>",
+    "VIDEO_PLACEHOLDER": "<|lf_video_input|>",
+    "AUDIO_PLACEHOLDER": "<|lf_audio_input|>"
+  }
+}

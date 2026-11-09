@@ -1,0 +1,981 @@
+diff --git a/sft/runtime/checkpoint_observer.py b/sft/runtime/checkpoint_observer.py
+index ff26431..1725443 100644
+--- a/sft/runtime/checkpoint_observer.py
++++ b/sft/runtime/checkpoint_observer.py
+@@ -1,4 +1,4 @@
+-"""Passive timing around pinned native save APIs; no replacement training loop."""
++"""Checkpoint identity and durability evidence around native save APIs."""
+ import ctypes
+ import functools
+ import json
+@@ -11,8 +11,6 @@ import time
+ import torch
+ from transformers import Trainer
+ from transformers.trainer_callback import CallbackHandler
+-from deepspeed.runtime.engine import DeepSpeedEngine
+-from deepspeed.runtime.checkpoint_engine.torch_checkpoint_engine import TorchCheckpointEngine
+ 
+ from .checkpoint_archive import storage_settings, durable_completion, enqueue,atomic_json
+ 
+@@ -27,7 +25,6 @@ class CheckpointObserver:
+         self.saving = False
+         self.save_started = None
+         self.before = None
+-        self.phase_seconds = {}
+         self.driver = None
+ 
+     def identity(self):
+@@ -70,28 +67,6 @@ class CheckpointObserver:
+             return native_train(trainer, *args, **kwargs)
+         Trainer.train = train
+ 
+-        def time_native(owner, name, label):
+-            native = getattr(owner, name)
+-            @functools.wraps(native)
+-            def timed(instance, *args, **kwargs):
+-                if not observer.saving:
+-                    return native(instance, *args, **kwargs)
+-                start = time.monotonic()
+-                result = native(instance, *args, **kwargs)
+-                elapsed = time.monotonic() - start
+-                observer.phase_seconds[label] = observer.phase_seconds.get(label, 0) + elapsed
+-                observer.callback.record('checkpoint_phase', observer.trainer.state,
+-                                         phase=label, seconds=elapsed)
+-                return result
+-            setattr(owner, name, timed)
+-
+-        time_native(Trainer, 'save_model', 'model_export_total')
+-        time_native(Trainer, '_save_optimizer_and_scheduler', 'optimizer_scheduler_total')
+-        time_native(DeepSpeedEngine, '_zero3_consolidated_16bit_state_dict', 'zero3_weight_gather_and_CPU_copy')
+-        time_native(DeepSpeedEngine, 'save_checkpoint', 'zero3_native_checkpoint_total')
+-        time_native(DeepSpeedEngine, '_save_zero_checkpoint', 'zero3_optimizer_state_and_shard')
+-        time_native(TorchCheckpointEngine, 'save', 'torch_shard_serialization_and_write')
+-
+         native_save = Trainer._save_checkpoint
+         @functools.wraps(native_save)
+         def save_checkpoint(trainer, *args, **kwargs):
+@@ -112,7 +87,6 @@ class CheckpointObserver:
+             if failure[0]:
+                 raise RuntimeError(failure[0])
+             observer.save_started = time.monotonic()
+-            observer.phase_seconds = {}
+             observer.before = observer.state_sample()
+             observer.saving = True
+             observer.callback.record('checkpoint_save_begin', trainer.state, **observer.before)
+@@ -123,9 +97,6 @@ class CheckpointObserver:
+                                          error=type(error).__name__ + ': ' + str(error))
+                 observer.saving = False
+                 raise
+-            observer.callback.record('checkpoint_native_save_end', trainer.state,
+-                                     seconds=time.monotonic() - observer.save_started,
+-                                     identity=observer.identity())
+             return result
+         Trainer._save_checkpoint = save_checkpoint
+ 
+@@ -173,7 +144,6 @@ class CheckpointObserver:
+                 raise RuntimeError('Native checkpoint changed process/context/training state')
+             observer.callback.record('checkpoint_save_complete', state, identity=after['identity'],
+                                      process_context_engine_unchanged=stable, training_state_unchanged=unchanged,
+-                                     native_phase_seconds=observer.phase_seconds,
+                                      fsync_seconds_rank0=fsync_seconds, pin_seconds_rank0=pin_seconds,
+                                      archive_status_rank0=archive_status,
+                                      total_pause_seconds=time.monotonic() - observer.save_started)
+diff --git a/studies/ci_positive_control/README.md b/studies/ci_positive_control/README.md
+index c1cea1a..71136c6 100644
+--- a/studies/ci_positive_control/README.md
++++ b/studies/ci_positive_control/README.md
+@@ -38,27 +38,29 @@ trajectories enter training. The terminal project's large SFT remains paused.
+ 
+ `encode_data.py` calls the production codec with the explicit
+ `published_messages` evidence contract. It does not pretend these are captured
+-teacher HTTP payloads. The frozen SGLang Pydantic tool rendering adds
+-`strict:false` and fixes field order. The actual server preprocessing and six
+-real initial/post-observation prefixes were checked. The final cache uses this
+-rendering; the older r1 cache is diagnostic only.
++teacher HTTP payloads. New builds capture tools through the complete archived
++SGLang `_process_messages` entry. The historical inner-template capture added
++`strict:false` and skipped router ordering; those old caches remain frozen.
+ 
+ ## Training objective and recipe
+ 
+-The trainer is LF's native `run_exp` and DeepSpeed, with the numerically accepted
+-global token normalization intervention. For each real optimizer update:
++The trainer is LF's native `run_exp` and DeepSpeed, with native Transformers token normalization. The candidate enables
++`model_accepts_loss_kwargs` after LF attaches its processor. CPU DP4 GA8/GA2
++controls pass; production Qwen/Liger/ZeRO3 admission is pending. For each real optimizer update:
+ 
+ ```
+ objective = sum(shifted assistant CE across all DP ranks and GA micros)
+             / sum(shifted supervised tokens across those same ranks/micros)
+ ```
+ 
+-The unchanged normalization code multiplies each native microbatch mean by
+-`DP * actual_GA * micro_tokens / global_tokens`; native Trainer divides by the
+-actual GA, disables DeepSpeed's second GA scaling, and distributed gradients
+-average across DP. The tail uses the real four micros. No segment/trajectory
+-mean is the optimization objective. Native online Trainer loss is an update
+-average; compute cumulative token mean separately from rank normalization logs.
++The candidate uses native `num_items_in_batch`, native distributed token counting,
++and native loss scaling. Neither `get_batch_samples` nor `compute_loss` is
++patched. Historical `normalization.py`, `audit_cpu_update.py`,
++`audit_cuda_backbone.py` and `audit_runtime_identity.py` remain reference controls
++for the frozen old run; they do not describe the candidate entry. Native online
++Trainer loss is an update mean, not a corpus token-weighted mean. The candidate
++does not emit historical `normalization-rank*.jsonl`; use native Trainer logs and
++forward evidence, and evaluate frozen checkpoints separately.
+ Fixed-checkpoint validation uses all 194 unique rows and a global token sum.
+ 
+ Recipe: full language SFT, frozen vision, BF16 mixed compute with FP32 master and
+@@ -104,8 +106,8 @@ PYTHONPATH=$R/source/training-frozen-r2 $T/bin/python $S/export_epoch.py $R 1 --
+ PYTHONPATH=$R/source/training-frozen-r2 $T/bin/python $S/export_epoch.py $R 2 --device cuda:0
+ ```
+ 
+-They retain full native checkpoints and make separate HF snapshots, restore the
+-pinned serving tokenizer in those snapshots, hash all files, then independently
++They retain full native checkpoints and make separate HF snapshots, preserve the
++checkpoint's native tokenizer/processor files, hash all files, then independently
+ load and generate on an explicitly authorized GPU. The installed causal-conv1d
+ fast path is CUDA-only; the original CPU smoke failed after training completed.
+ Use `--verify-existing` to validate that already exported immutable snapshot;
+@@ -180,3 +182,47 @@ control. That control must reconstruct from the same frozen raw messages/tools,
+ not reuse this cache as independent evidence, and match the target objective,
+ LR/order/token exposure before the same CIBench evaluation. This control is not
+ yet run, and no outcome is claimed before real training/evaluation completes.
++
++The native-LF audit candidate also removes CI’s explicit `skip_logits` forward
++partial: this study has no Trainer evaluation, and pinned Liger’s native
++training default already selects fused loss. Bounded full Qwen4B DP4 GA8/GA2
++controls used that default; native token-denominator differences were of the
++same scale as one same-mode repeat pair. See `studies/native_lf/README.txt` for
++raw error magnitudes, tokenizer identity, and Teacher-offload limitations.
++# Tool projection must cross the full serving request entry
++
++For new data builds, run `capture_server_projection.py` with the serving Python
++environment against a new experiment root before `encode_data.py`. The capture
++observes the tools actually passed to the tokenizer by `_process_messages`,
++including `exclude_unset` and JSON key ordering. The old inner-template capture
++added `strict=False` and missed router ordering. On two real original traces,
++its encoded inputs matched 0/11 complete-router decision prefixes; the corrected
++capture and actual encoder matched 11/11. Positive target token sequences stayed
++identical. This is CPU input-contract evidence, not a new training/evaluation run
++or proof of downstream causality.
++
++The encoder checks the full-entry capture and projection file SHA and rejects
++old or mismatched projection files. Rebuild into a new root. Keep frozen
++experiments unchanged. This fix is separate from the new native LF recipe's
++remaining LF-template versus SGLang-Jinja format difference.
++
++`encode_data.py` always encodes the current input, saves its actual tokenizer via
++native `save_pretrained` in `data/tokenizer`, and records class, package versions
++and saved file hashes. The removed `--reuse-from` optimization accepted caches
++from a tokenizer with different behavior: on real CI row7032, reuse matched only
++3/7 complete-router prefixes; fresh encoding and archived serving reload of the
++saved tokenizer matched 7/7. Positive targets stayed identical.
++
++CI and Teacher tokenizers must not be assumed identical. On frozen CI row7032,
++M0's TF5.8 Qwen2Tokenizer matches all seven old cache prefixes; the Teacher
++snapshot matches three. In archived TF5.3, the native CI checkpoint tokenizer
++also matches seven, whereas the old M0-restored serving assets match three.
++New `export_epoch.py` therefore preserves checkpoint-native assets. Actual
++before/after export assembly plus tokenizer loading passed the CPU regression;
++the separate 4B generation smoke was excluded from that audit control.
++
++The corrected legacy codec also completed all 8,391 rows/45,592 decision prefixes
++against the complete archived frontend with its actual saved tokenizer. Positive
++targets, non-system history, and all 514 replayed sampler denominators remain
++identical; all target ranges shift by 36 tokens. This is CPU input-contract
++evidence, separately from the new native LF data format and GPU update controls.
+diff --git a/studies/ci_positive_control/audit_runtime_identity.py b/studies/ci_positive_control/audit_runtime_identity.py
+index 7f348fd..ab9c0ea 100644
+--- a/studies/ci_positive_control/audit_runtime_identity.py
++++ b/studies/ci_positive_control/audit_runtime_identity.py
+@@ -1,4 +1,9 @@
+-"""Read-only 8197-run provenance and reconstructed Python binding audit."""
++"""Historical CI8197 wrapper reconstruction, not the native-token candidate.
++
++Run against the frozen 7491e0e source/package payload only. This script and
++normalization.py remain historical audit controls; train_ci no longer installs
++those wrappers. Do not use this reconstruction to identify a new candidate run.
++"""
+ import difflib
+ import functools
+ import hashlib
+@@ -84,7 +89,7 @@ def main():
+         save(name+'-file-comparison.json',rows)
+         diffs[name]={k:sum(r['status']==k for r in rows)for k in ['same','modified','installed_only','upstream_only']}
+     provenance['diff_counts']=diffs
+-    # Import order mirrors train_ci: normalization(torch), LF trainer/tuner, project callback, observer.
++    # Import order mirrors historical frozen train_ci: normalization(torch), LF trainer/tuner, project callback, observer.
+     import torch
+     torch.set_num_threads(1)
+     from llamafactory.train.sft.trainer import CustomSeq2SeqTrainer
+diff --git a/studies/ci_positive_control/capture_server_projection.py b/studies/ci_positive_control/capture_server_projection.py
+index 70b6c12..47a98a6 100644
+--- a/studies/ci_positive_control/capture_server_projection.py
++++ b/studies/ci_positive_control/capture_server_projection.py
+@@ -4,6 +4,7 @@ import json
+ from pathlib import Path
+ import sys
+ from types import SimpleNamespace
++from unittest.mock import patch
+ 
+ from transformers import AutoTokenizer
+ from sglang.srt.entrypoints.openai.protocol import ChatCompletionRequest
+@@ -22,7 +23,10 @@ def main(root):
+     tools=json.loads((root/'configs/tools.json').read_text())
+     handler=OpenAIServingChat.__new__(OpenAIServingChat)
+     handler.use_dpsk_v32_encoding=False
+-    handler.template_manager=SimpleNamespace(jinja_template_content_format='openai')
++    handler.is_gpt_oss=False
++    handler.reasoning_parser='qwen3'
++    handler.tool_call_parser='qwen3_coder'
++    handler.template_manager=SimpleNamespace(jinja_template_content_format='openai',chat_template_name=None)
+     handler.tokenizer_manager=SimpleNamespace(tokenizer=tokenizer)
+     rows=[];projected=None
+     for line in (root/'data/replay-traces.jsonl').open():
+@@ -30,20 +34,28 @@ def main(root):
+         for index in [1,3]:
+             request=ChatCompletionRequest(model='qwen35-ci-m0',messages=messages[:index],tools=tools,
+                 max_tokens=1,chat_template_kwargs={'enable_thinking':False})
+-            served_tools=[t.model_dump() for t in request.tools]
++            # Observe the exact tools reaching the tokenizer after the real
++            # router's exclude_unset and ordering, without duplicating them.
++            with patch.object(tokenizer,'apply_chat_template',wraps=tokenizer.apply_chat_template) as render:
++                result=handler._process_messages(request,is_multimodal=False)
++                assert render.call_count==1, 'Expected one successful Qwen template application'
++                served_tools=render.call_args.kwargs['tools']
+             if projected is None:projected=served_tools
+-            assert served_tools==projected
+-            result=handler._apply_jinja_template(request,served_tools,is_multimodal=False)
++            assert json.dumps(served_tools,ensure_ascii=False)==json.dumps(projected,ensure_ascii=False)
+             reference=tokenizer.apply_chat_template(messages[:index],tools=served_tools,
+                 enable_thinking=False,add_generation_prompt=True,tokenize=True,return_dict=False)
+             assert result.prompt_ids==reference
+             rows.append(dict(trace_id=source['id'],target_index=index,
++                             template_applications=render.call_count,
+                              actual_preprocessor_input_ids=result.prompt_ids))
+-    (root/'configs/sglang-template-tools.json').write_text(json.dumps(projected,indent=2)+'\n')
++    projection_path=root/'configs/sglang-template-tools.json'
++    projection_path.write_text(json.dumps(projected,indent=2)+'\n')
+     import inspect
+     src=Path(inspect.getfile(OpenAIServingChat))
+     result=dict(status='PASSED',serving_source=str(src),serving_source_sha256=hashlib.sha256(src.read_bytes()).hexdigest(),
+-        tools_added_defaults='The real Pydantic Tool view adds strict=False and fixes field order',
++        processing_entry='_process_messages',
++        tool_projection_file_sha256=hashlib.sha256(projection_path.read_bytes()).hexdigest(),
++        tool_projection='Exact tools passed by the full router to the tokenizer, including exclude_unset and ordering',
+         logical_tools_unchanged=True,checks=rows)
+     (root/'checks/actual-server-preprocessor.json').write_text(json.dumps(result,indent=2)+'\n')
+     print('REAL_PREPROCESSOR_PASSED',len(rows),flush=True)
+diff --git a/studies/ci_positive_control/encode_data.py b/studies/ci_positive_control/encode_data.py
+index 131382e..40e696c 100644
+--- a/studies/ci_positive_control/encode_data.py
++++ b/studies/ci_positive_control/encode_data.py
+@@ -1,41 +1,32 @@
+ """Use the production Qwen codec/decision merger; preserve full trajectories."""
+ from collections import Counter
+ import argparse
++import hashlib
++from importlib.metadata import version
+ import json
+-import os
+ from pathlib import Path
+-import sys
+ 
+-from datasets import Dataset, DatasetDict, load_from_disk
++from datasets import Dataset, DatasetDict
+ import numpy as np
+ from sft.qwen35 import load_tokenizer, digest
+ from sft.teacher_segments import project_decision, make_segments
+ from tool_contract import schemas, messages
+ 
+ 
+-def main(root, reuse_from=None):
++def main(root):
+     root = Path(root)
+     tok = load_tokenizer()
+     vocab_size = len(tok)
+     summary = {}
+     cache = {}
+-    served_tools = json.loads((root / "configs/sglang-template-tools.json").read_text())
+-    reuse={}
+-    if reuse_from is not None:
+-        base=Path(reuse_from)
+-        identity=json.loads((base/'checks/encoding-r2.json').read_text())
+-        assert identity['model_revision']=='851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a'
+-        assert identity['template_sha256']==digest(tok.chat_template)
+-        assert identity['thinking'] is False and identity['compaction'] is False
+-        assert identity['cutoff_len']==262144
+-        assert all(identity[part]['all_targets_exactly_once']and not identity[part]['truncation']for part in ['train','validation'])
+-        assert (base/'configs/sglang-template-tools.json').read_bytes()==(root/'configs/sglang-template-tools.json').read_bytes()
+-        base_data=load_from_disk(str(base/'data/cache-262144-r2'))
+-        for split in ['train','validation']:
+-            sources={x['source']['id']:x['source']for x in map(json.loads,(base/f'data/{split}-raw.jsonl').open())}
+-            old_index=[json.loads(line)for line in (base/f'data/{split}-encoding-index-r2.jsonl').open()]
+-            assert len({x['trace_id']for x in old_index})==len(old_index), 'Only unsplit complete traces can reuse this cache'
+-            reuse[split]={x['trace_id']:(n,x,sources[x['trace_id']])for n,x in enumerate(old_index)}
++    projection_path = root / "configs/sglang-template-tools.json"
++    projection = json.loads((root / "checks/actual-server-preprocessor.json").read_text())
++    if (projection.get("processing_entry") != "_process_messages"
++            or projection.get("tool_projection_file_sha256") != hashlib.sha256(projection_path.read_bytes()).hexdigest()):
++        raise ValueError("Capture fresh tools through the full serving request entry before encoding")
++    served_tools = json.loads(projection_path.read_text())
++    tokenizer_path = root / 'data/tokenizer'
++    tok.save_pretrained(tokenizer_path)
+     def semantic_tools(tools):
+         import copy
+         result=copy.deepcopy(tools)
+@@ -55,26 +46,14 @@ def main(root, reuse_from=None):
+                 raise ValueError("Published tool semantics differ from the frozen serving schema")
+             tools = served_tools
+             decision_count=sum(m['role']=='assistant'for m in native)
+-            previous=reuse.get(split,{}).get(source['id'])
+-            if previous:
+-                n,old,old_source=previous
+-                # Dict equality alone would miss tool-argument insertion order.
+-                assert json.dumps(old_source,ensure_ascii=False)==json.dumps(source,ensure_ascii=False)
+-                assert old['tools_sha256']==digest(tools) and old['original_trace_sha256']==item['source_trace_sha256']
+-                row=base_data[split][n]
+-                assert digest(row['input_ids'])==old['input_sha256'] and digest(row['labels'])==old['labels_sha256']
+-                old_evidence={k:v for k,v in old.items()if k not in {'trace_id','task_group','original_trace_sha256','tools_sha256'}}
+-                merged=dict(quarantine=[],all_targets_exactly_once=True,samples=[dict(row=row,evidence=old_evidence)])
+-                counts['byte_identical_cache_reused_trajectories']+=1
+-            else:
+-                decisions=[]
+-                for index,response in enumerate(native):
+-                    if response['role']!='assistant':continue
+-                    packet=dict(call_id=source['id']+f':{index}',context_fidelity='published_messages',
+-                        provider_payload=dict(messages=native[:index],tools=tools),assistant_response=response)
+-                    decisions.append(project_decision(tok,packet,enable_thinking=False,projection_source='published_messages'))
+-                merged=make_segments(decisions,cutoff=262144)
+-                counts['newly_encoded_trajectories']+=1
++            decisions=[]
++            for index,response in enumerate(native):
++                if response['role']!='assistant':continue
++                packet=dict(call_id=source['id']+f':{index}',context_fidelity='published_messages',
++                    provider_payload=dict(messages=native[:index],tools=tools),assistant_response=response)
++                decisions.append(project_decision(tok,packet,enable_thinking=False,projection_source='published_messages'))
++            merged=make_segments(decisions,cutoff=262144)
++            counts['newly_encoded_trajectories']+=1
+             if merged["quarantine"]:
+                 raise ValueError("Overlength trace requires an explicit decision, never truncation")
+             assert merged["all_targets_exactly_once"]
+@@ -110,13 +89,17 @@ def main(root, reuse_from=None):
+                   cutoff_len=262144, global_loss="sum shifted supervised CE / global update supervised token count",
+                   **summary)
+     result.update(conditioning_source="Published ChatML messages; original teacher HTTP payload not released",
+-                  serving_tool_projection="Actual frozen SGLang Pydantic Tool.model_dump output; strict=False and field order",
++                  serving_tool_projection="Actual full SGLang _process_messages tools passed to tokenizer; exclude_unset and field order",
+                   original_message_and_code_unchanged=True)
+-    if reuse_from is not None:result['reused_cache_source']=str(Path(reuse_from))
++    result['tokenizer'] = dict(path='data/tokenizer',
++        runtime_class=type(tok).__module__ + '.' + type(tok).__qualname__,
++        transformers_version=version('transformers'), tokenizers_version=version('tokenizers'),
++        files={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
++               for p in sorted(tokenizer_path.iterdir()) if p.is_file()})
+     (root / "checks/encoding-r2.json").write_text(json.dumps(result, indent=2) + "\n")
+     print(json.dumps(result), flush=True)
+ 
+ 
+ if __name__ == "__main__":
+-    parser=argparse.ArgumentParser();parser.add_argument('root');parser.add_argument('--reuse-from')
+-    args=parser.parse_args();main(args.root,args.reuse_from)
++    parser=argparse.ArgumentParser();parser.add_argument('root')
++    args=parser.parse_args();main(args.root)
+diff --git a/studies/ci_positive_control/export_epoch.py b/studies/ci_positive_control/export_epoch.py
+index 3a9dab6..f296de1 100644
+--- a/studies/ci_positive_control/export_epoch.py
++++ b/studies/ci_positive_control/export_epoch.py
+@@ -56,19 +56,17 @@ def main(root,epoch,device,verify_existing=False):
+     for name in sorted(weights):os.link(source/name,output/name)
+     for name in ['config.json','trainer_state.json']+(['model.safetensors.index.json']if index.exists()else[]):
+         shutil.copy2(source/name,output/name)
+-    # Restore the actual serving tokenizer/template in a SEPARATE export.
+-    # Native checkpoint metadata and optimizer resume files remain untouched.
+-    m0=Path('/data/models/Qwen/Qwen3.5-4B')
++    # Preserve the tokenizer saved by the native training checkpoint.
+     for name in ['tokenizer.json','tokenizer_config.json','chat_template.jinja','merges.txt','vocab.json',
+                  'added_tokens.json','special_tokens_map.json','generation_config.json',
+                  'preprocessor_config.json','processor_config.json']:
+-        if (m0/name).exists():shutil.copy2(m0/name,output/name)
++        if (source/name).exists():shutil.copy2(source/name,output/name)
+     files=[dict(path=p.name,bytes=p.stat().st_size,sha256=sha256(p))for p in sorted(output.iterdir())]
+     manifest=dict(epoch=epoch,optimizer_step=step,source_checkpoint=str(source),
+         complete_native_checkpoint_sha256=sha256(source/'CHECKPOINT_COMPLETE.json'),
+         model='Qwen/Qwen3.5-4B',base_revision='851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a',
+         full_hf_snapshot=True,stage_training_complete=epoch==2,
+-        tokenizer_policy='Pinned M0 official tokenizer, identical to the pre-encoded and serving prefix',files=files)
++        tokenizer_policy='Native checkpoint tokenizer and processor files, without M0 replacement',files=files)
+     (output/'HF_EXPORT_COMPLETE.json').write_text(json.dumps(manifest,indent=2)+'\n')
+     verify_snapshot(output,epoch,device)
+ 
+diff --git a/studies/ci_positive_control/observe.py b/studies/ci_positive_control/observe.py
+index ef251f1..452d57d 100644
+--- a/studies/ci_positive_control/observe.py
++++ b/studies/ci_positive_control/observe.py
+@@ -31,10 +31,9 @@ def main(root):
+         if trainer.is_file():
+             data=json.loads(trainer.read_text())
+             item.update(global_step=data.get('global_step'),epoch=data.get('epoch'))
+-        logs=run/'normalization-rank0.jsonl'
+-        if logs.is_file():item['last_rank0_progress_mtime']=logs.stat().st_mtime
+         evidence=run/'preflight-evidence-rank0.jsonl'
+         if evidence.is_file():
++            item['last_rank0_progress_mtime']=evidence.stat().st_mtime
+             # Read only a bounded tail while the training process appends.
+             with evidence.open('rb') as handle:
+                 handle.seek(max(0,evidence.stat().st_size-128*1024))
+diff --git a/studies/ci_positive_control/prepare_train.py b/studies/ci_positive_control/prepare_train.py
+index fa9c8f9..0a2dcf3 100644
+--- a/studies/ci_positive_control/prepare_train.py
++++ b/studies/ci_positive_control/prepare_train.py
+@@ -50,7 +50,7 @@ def main(root):
+                 validation_policy="Offline unique-row global token NLL at M0, E1, E2; never distributed sample-mean eval_loss",
+                 data_manifest_sha256=hashlib.sha256((root/"checks/selection.json").read_bytes()).hexdigest(),
+                 encoding_sha256=hashlib.sha256((root/"checks/encoding-r2.json").read_bytes()).hexdigest(),
+-                normalization_origin="Numerically accepted 20261105 normalization.py, token arm only; identical source bytes")
++                normalization_origin="Transformers 5.8 native num_items_in_batch; loss kwargs enabled after LF processor guard; CPU and bounded Qwen4B DP4 ZeRO3 GA8/GA2 controls, numerical differences calibrated with same-mode repeats")
+     path=root/"configs/train-r2.json"
+     if path.exists():raise FileExistsError("Frozen recipe already exists")
+     path.write_text(json.dumps(result,indent=2)+"\n")
+diff --git a/studies/ci_positive_control/train_ci.py b/studies/ci_positive_control/train_ci.py
+index eaf2547..9290d85 100644
+--- a/studies/ci_positive_control/train_ci.py
++++ b/studies/ci_positive_control/train_ci.py
+@@ -5,7 +5,7 @@ import json
+ import os
+ from pathlib import Path
+ 
+-from normalization import install
++from studies.native_lf.token_mean import enable_native_token_mean
+ 
+ 
+ def main():
+@@ -34,12 +34,15 @@ def main():
+     rank=int(os.environ['RANK'])
+     with (output/f'resolved-config-rank{rank}-pid{os.getpid()}.json').open('x') as handle:
+         handle.write(json.dumps(spec,indent=2)+"\n")
+-    from llamafactory.train.sft.trainer import CustomSeq2SeqTrainer
+     from llamafactory.train.tuner import run_exp
+     from sft.runtime.lf_train import EvidenceCallback, optimizer_evidence, audit_native_rng_restore
+     from sft.runtime.checkpoint_observer import CheckpointObserver
+     from sft.qwen35 import digest
+     class CIEvidence(EvidenceCallback):
++        def on_train_begin(self, args, state, control, **kwargs):
++            enable_native_token_mean(self.checkpoint_observer.trainer)
++            return super().on_train_begin(args, state, control, **kwargs)
++
+         def observe_batch(self,module,inputs,keywords):
+             super().observe_batch(module,inputs,keywords)
+             if not module.training or keywords.get('labels') is None:return
+@@ -47,8 +50,8 @@ def main():
+             self.forward_batches[-1].update(
+                 input_sha256=digest(keywords['input_ids'][0][keep].detach().cpu().tolist()),
+                 labels_sha256=digest(keywords['labels'][0][keep].detach().cpu().tolist()))
+-    install(CustomSeq2SeqTrainer,'token')
+-    callback=CIEvidence(output,loss_only=True)
++    # CI has no eval; official Liger already skips logits for training labels.
++    callback=CIEvidence(output,loss_only=False)
+     callback.cutoff=cfg['cutoff_len']
+     callback.runtime_recipe='ci_public_positive_control'
+     callback.checkpoint_observer=CheckpointObserver(callback,optimizer_evidence,archive_enabled=False).install()
+diff --git a/tests/test_checkpoint_observer.py b/tests/test_checkpoint_observer.py
+index 5728924..6a5cda9 100644
+--- a/tests/test_checkpoint_observer.py
++++ b/tests/test_checkpoint_observer.py
+@@ -44,15 +44,19 @@ class SaveBoundary(unittest.TestCase):
+             trainer=SimpleNamespace(state=SimpleNamespace(global_step=1,is_world_process_zero=True),
+                 args=SimpleNamespace(output_dir=temp),model=object(),model_wrapped=object(),optimizer=object(),lr_scheduler=scheduler)
+             callback=SimpleNamespace(selected=[('weight',None)],weight=lambda value:'fixed-master-hash',
+-                                     record=lambda event,state,**data:events.append(dict(event=event,**data)))
++                                     record=lambda event,state,**data:events.append(dict(event=event,**data)),
++                                     runtime_recipe='agent_sft_v1')
+             observer=CheckpointObserver(callback,lambda optimizer:{'Adam':'fixed'})
+             def train(instance,*args,**kwargs):return None
+             def save(instance,*args,**kwargs):fixture(folder)
+             def last_callback(handler,args,state,control):
+                 (folder/'late-processor.json').write_text('{}')
+                 return control
++            native_identity=observer.identity
++            # The CPU fixture contains four rank shards; no distributed run is claimed.
+             with patch.object(Trainer,'train',train),patch.object(Trainer,'_save_checkpoint',save),\
+-                 patch.object(CallbackHandler,'on_save',last_callback):
++                 patch.object(CallbackHandler,'on_save',last_callback),\
++                 patch.object(observer,'identity',lambda:{**native_identity(),'world_size':4}):
+                 observer.install()
+                 Trainer.train(trainer)
+                 Trainer._save_checkpoint(trainer)
+diff --git a/studies/native_lf/README.txt b/studies/native_lf/README.txt
+new file mode 100644
+index 0000000..4b15595
+--- /dev/null
++++ b/studies/native_lf/README.txt
+@@ -0,0 +1,175 @@
++Native LF candidate — full CPU data and bounded Qwen4B GPU update controls
++
++NEW INPUT-CONTRACT FINDING:
++Historical CI capture called only SGLang's inner Jinja method. The full request
++router also orders tool JSON keys and excludes unset defaults. Using its actual
++logical eight-tool request, two old encoded traces match0/11 router decision
++prefixes; new full-entry capture plus the actual encoder match11/11. Positive
++target token vectors remain identical. New legacy CI builds require a fresh
++full-entry capture and verified projection file; old artifacts remain unchanged.
++The full8391 native data controls below used the previously frozen tool schema.
++They still establish field/label/collator behavior for those exact inputs, but
++are not a rebuilt corrected-schema corpus or corrected-data GPU admission.
++The native LF tool-format difference below is separate from this capture error.
++
++Pinned baseline: official LLaMA-Factory c683e59edd8f893abc5e1403184a1d0644817d2a,
++Transformers5.8.0, Accelerate1.11.0. The clean source was not edited.
++Use its native YAML entry; pinned src/train.py's JSON-file branch fails because
++it calls json.load(Path). Existing project run_exp(dict) was unaffected.
++
++CI whole trajectories:
++  python3 /absolute/path/export_teacher_lf.py CI-raw-messages.jsonl /new/ci-data \
++    --ci-union-null-padding
++  torchrun --nproc_per_node=4 src/train.py /absolute/path/ci-native.yaml \
++    dataset_dir=/new/ci-data output_dir=/absolute/path/new-output
++Run from the clean LF checkout. The preferred data path uses the same thin
++ShareGPT exporter as Teacher. The CI-only flag removes absent argument keys
++padded with null by the published union schema; it must not be used for Teacher
++provider payloads. All45592 real CI tool calls round-trip exactly through the
++archived serving parser with their actual tool schemas after this cleanup.
++All8391 native rows retain tool-call accompanying prose. Train/validation
++supervised totals are11452337/274224, versus old11407810/273159.
++The first target differs at token101: LF newline198 versus old double-newline271;
++all positive target vectors differ. This is not an old-label equivalence claim.
++
++The earlier raw-OpenAI control also encoded all8197train+194validation rows,
++but dropped accompanying prose and separate reasoning_content. That was a
++negative migration control, not the recommended data format. Its historical
++TokenizersBackend differs from M0's default Qwen2Tokenizer under TF5.8: all-corpus
++controls changed1 CI and27 MAX histories, while positive target sequences stayed
++identical. Re-encoding the OpenAI control at cutoff262144 versus32768 was exact;
++preferred ShareGPT max length31980 also fits the CI recipe's32768 cutoff.
++The preferred ShareGPT path passed CPU encoding/collator/parser checks; its exact
++data path has not run a production GPU update. The completed clean GPU CLI used
++the earlier OpenAI control.
++
++Teacher one real provider decision per row, preserve body and Thinking:
++  python /absolute/path/export_teacher_lf.py T_MAX-raw-decisions.jsonl /new/max-data
++  PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
++    torchrun --nproc_per_node=4 src/train.py /absolute/path/teacher-decision-native.yaml \
++    dataset_dir=/new/max-data output_dir=/new/max-output \
++    deepspeed=/absolute/path/teacher-native-ds.json
++Use the same commands with OFF raw decisions and new paths. Input JSONL has
++messages=actual history plus current assistant, tools=list or serialized JSON.
++Recorder private blocks first need their existing raw interchange reader.
++The exporter writes native ShareGPT conversations and dataset_info.json. Tool
++arguments stay in JSON strings in LF's native function slot, avoiding Arrow's
++chunk-dependent nested struct inference. LF handles function serialization,
++Thinking formatting, tokenization, mask_history, labels and padding.
++
++Full native OpenAI JSON ingestion failed on real dynamic arguments. A two-real-row regression fails before conversion and loads after ShareGPT conversion.
++The ShareGPT path passed all5201 decisions from64paired train tasks/arm. An
++independent official Qwen Jinja reconstruction matches every old decision input/
++labels SHA; every new target begins with the actual Thinking/body field prefix.
++This removes the need for teacher_segments/project Qwen tokenization and prefix-
++compatible merging from the NEW data path. Old files remain for frozen studies.
++
++The native labels/input tensors still differ from historical ones: empty-think
++opener supervision, end newline, BPE boundaries and tool formatting change.
++On the first real CI prompt, native LF and the tokenizer's saved original Jinja
++differ at token20: LF serializes flattened tools, while Jinja keeps the outer
++type/function object. Identical system newline handling does not remove this
++difference. Native labels are not automatically the current serving-prefix
++contract; that alignment remains a migration acceptance item.
++One decision per row also changes MAX optimizer steps12->70; OFF stays94 under
++DP4/GA8 with sampler padding. This is a training design choice, not an equivalence
++claim. Teacher cutoff stays262144: actual decision histories exceed128K.
++The recipe uses native ZeRO3 CPU offload with three historical config values:
++max_live_parameters=50M, max_reuse_distance=0, zero_force_ds_cpu_optimizer=false.
++These keep the tested cache/torch CPU AdamW path. They are config values, not
++optimizer code. Removing them and using the official LF example would also
++let Accelerate map AdamW to DeepSpeedCPUAdam; that alternative is untested.
++With unchanged real MAX/OFF longest+median rows, no saved-CPU hook, same old DS,
++and the requested expandable allocator, one DP4 partial-GA1 update completed;
++max torch allocated74.61GiB, train interval181.98s. The no-override attempt OOM.
++This is capacity evidence for four rows, not full GA8/epoch/validation admission.
++The allocator value was preserved in the executed launch command, not dumped
++from the exited process; see the audit provenance supplement.
++
++LOSS OBJECTIVE IS A SEPARATE CONTROL:
++The historical objective is global shifted-supervised-token mean per update.
++Clean LF disables model_accepts_loss_kwargs when a processor is attached. Thus
++these clean YAML recipes use LF's default loss weighting, not proof of equality
++to that historical token objective. average_tokens_across_devices alone cannot
++undo the guard. The candidate CI entry uses token_mean.py to enable native HF
++num_items_in_batch without replacing get_batch_samples/compute_loss. CPU DP4
++GA8/GA2 passes. Bounded full Qwen4B/BF16/ZeRO3 with the unchanged CI tensors
++compared native/wrapper/independent PyTorch CE: GA8 preclip/update relative
++differences0.00540/0.00411 versus native repeat0.00520/0.00393; isolated GA2
++0.00800/0.00528 versus repeat0.00758/0.00500. These are observed repeat-scale
++differences, not bitwise or statistical equivalence. Teacher offload is not
++covered. teacher-token-mean.patch is the equivalent change
++for a COPY of the frozen external r9 entry; it sets the same native flag inline
++and does not import a helper into the frozen source repository. It was not
++applied to frozen source.
++
++The clean original src/train.py also completed a four-A800 Qwen4B two-update
++run on40 raw CI trajectories and saved a final model. This uses new native
++OpenAI targets/default loss, separately from the frozen-tensor controls.
++CI no longer installs skip_logits partial: official Liger defaults to loss-only
++when training labels are present; CI evaluation stays disabled.
++
++Deleted: six phase-timing patches and a duplicate native-save event. Remaining
++identity/durability hooks and per-rank metrics have acceptance consumers in the
++legacy candidate. The clean YAML paths do not install those custom callbacks.
++Historical normalization.py/audit_* scripts remain old-run reference controls.
++No GPU memory/speed benefit from removals is claimed without paired measurement.
++
++Reports, scripts, per-decision values and independent review:
++/home/cky/workspace/RSI/audits/native-lf-simplification-20261109/
++No old checkpoint, frozen source, stopped evaluation, or remote branch changed.
++
++TOKENIZER IDENTITY CORRECTION:
++The snapshot/original class census above compares two candidate encodings; it
++does not identify the historical CI data tokenizer. Frozen CI row7032 matches
++TF5.8 M0 Qwen2Tokenizer on7/7 decision prefixes, the Teacher snapshot on3/7.
++In the archived TF5.3 serving environment the native CI checkpoint matches7/7,
++the old M0-restored serving assets3/7. The earlier claim that CI restoration was
++necessary is withdrawn. New CI export preserves native checkpoint assets; the
++old immutable export is untouched. Real export assembly and CPU token consumption
++pass the before/after regression; 4B generation was deliberately not run.
++The legacy candidate also deletes its custom cache-reuse branch and saves the
++actual tokenizer with save_pretrained. With the same current M0 tokenizer,
++reuse silently accepted a different tokenizer's cache (real7032 prefixes3/7),
++while fresh encoding and serving reload of the saved snapshot match7/7.
++
++Teacher's actual cached3362 training rows and5201 real decisions separately pass
++the complete archived serving frontend on CPU, including all masks and prefixes.
++The node18 replica was bound by all23 file hashes to actual node17 training caches.
++Independent review checked all3362 masks/member coverage and reran4 key cached
++prefixes. No claim of historical live-worker or production GPU verification.
++
++The corrected legacy CI codec now also passed the full CPU contract using the
++actual CI M0-default tokenizer: all8391 cache rows/all45592 complete-frontend
++prefixes, identical positive targets and history after the first system segment,
++all supervised ranges shifted36, all514 sampler denominators unchanged. This is
++separate from the native LF ShareGPT data/template controls, and is not a new
++corrected-data GPU forward or a causal regression experiment.
++
++The official LF SGLangEngine input_ids interface was separately tested offline
++on the first real native CI row. With the candidate preserve_thinking=False,
++only1/6 native inference prefixes matches native SFT; historical empty-thinking
++markers are removed. True matches6/6 when the supplied native aligned history
++explicitly contains those markers, with both modes' training tensors unchanged.
++True does not add missing client markers or fix nonempty CoT history generally.
++No production config was changed based on this scoped inference control; it does
++not establish LF OpenAI API or live backend compatibility.
++
++LIGER COMPONENT CONTROL (optional candidate, GPU pending):
++The matched full-Qwen normal window changed preclip gradients8.26% when only
++ordinary RMSNorm was switched, versus0.52% same-mode repeat; SwiGLU was0.54%.
++No kernel bug or downstream cause is established. Native Transformers can keep
++only fused CE through use_liger_kernel/liger_kernel_config; no custom kernel
++wrapper is needed. liger-ce-only.patch expresses that with native YAML fields.
++CPU Trainer.train binding kept HF RMSNorm/MLP and installed only Liger forward,
++but stopped before forward. Its four-GPU CLI test was refused because another
++job occupied the GPUs. Do not mark this optional patch GPU-admitted.
++
++TOKENIZER EXPORT:
++New native data uses M0's default Qwen2Tokenizer under TF5.8; full original-vs-
++historical-class comparisons changed1 CI and27 MAX histories, with all positive
++target token sequences unchanged. The native saved tokenizer correctly round-
++trips those real Unicode feedback texts in the archived serving TF5.3 runtime.
++The old CI export repair restores M0 JSON to match the historical preencoded
++cache. It is necessary for that old path but must not be transplanted into this
++new native path: preserve the tokenizer that native training actually saved.
+diff --git a/studies/native_lf/ci-native.yaml b/studies/native_lf/ci-native.yaml
+new file mode 100644
+index 0000000..87a8e39
+--- /dev/null
++++ b/studies/native_lf/ci-native.yaml
+@@ -0,0 +1,37 @@
++# Clean pinned LF baseline, not token/label equivalent to the historical cache.
++# Run from the clean LF checkout; override paths using native CLI key=value.
++model_name_or_path: /data/models/Qwen/Qwen3.5-4B
++model_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
++stage: sft
++do_train: true
++finetuning_type: full
++freeze_vision_tower: true
++freeze_multi_modal_projector: true
++freeze_language_model: false
++template: qwen3_5
++dataset: real
++dataset_dir: /path/to/new-ci-raw-data
++output_dir: /path/to/new-ci-native-output
++cutoff_len: 32768
++packing: false
++mask_history: false
++enable_thinking: false
++preserve_thinking: false
++bf16: true
++optim: adamw_torch
++gradient_checkpointing: true
++use_reentrant_gc: false
++seed: 42
++data_seed: 42
++flash_attn: fa2
++enable_liger_kernel: true
++deepspeed: examples/deepspeed/ds_z3_config.json
++per_device_train_batch_size: 1
++gradient_accumulation_steps: 8
++learning_rate: 1.0e-5
++num_train_epochs: 2.0
++lr_scheduler_type: cosine
++warmup_ratio: 0.05
++logging_steps: 1
++save_strategy: epoch
++report_to: none
+diff --git a/studies/native_lf/export_teacher_lf.py b/studies/native_lf/export_teacher_lf.py
+new file mode 100644
+index 0000000..20e8edf
+--- /dev/null
++++ b/studies/native_lf/export_teacher_lf.py
+@@ -0,0 +1,63 @@
++"""Export canonical messages (whole CI trace or Teacher decision) to ShareGPT.
++
++The locked LF FunctionFormatter consumes JSON inside its native tool-call slot.
++Dynamic argument dicts stay in strings, while Thinking and body stay as text.
++Tokenization, history masking, padding and labels belong to LF.
++"""
++import argparse
++import json
++from pathlib import Path
++
++
++def convert(record, ci_union_null_padding=False):
++    messages = []
++    for message in record['messages']:
++        role = message['role']
++        content = message.get('content') or ''
++        if role == 'assistant':
++            content = '<think>\n' + (message.get('reasoning_content') or '') + '\n</think>\n\n' + content
++            if calls := message.get('tool_calls'):
++                functions = []
++                for call in calls:
++                    function = dict(call['function'])
++                    if isinstance(function['arguments'], str):
++                        function['arguments'] = json.loads(function['arguments'])
++                    if ci_union_null_padding:
++                        function['arguments'] = {k: v for k, v in function['arguments'].items() if v is not None}
++                    functions.append(function)
++                payload = json.dumps(functions, ensure_ascii=False)
++                payload = payload.replace('<', '\\u003c').replace('>', '\\u003e')
++                content += '<tool_call>' + payload + '</tool_call>'
++                role = 'function_call'
++        elif role == 'tool':
++            role = 'observation'
++            if messages and messages[-1]['from'] == 'observation':
++                messages[-1]['value'] += '\n</tool_response>\n<tool_response>\n' + content
++                continue
++        elif role == 'system':
++            content += '\n'
++        tag = {'user': 'human', 'assistant': 'gpt'}.get(role, role)
++        messages.append({'from': tag, 'value': content})
++    tools = record['tools']
++    return {'conversations': messages, 'tools': tools if isinstance(tools, str) else json.dumps(tools, ensure_ascii=False)}
++
++
++def main():
++    parser = argparse.ArgumentParser()
++    parser.add_argument('input', type=Path, help='JSONL: messages history plus current assistant, and tools')
++    parser.add_argument('output', type=Path, help='New dataset directory')
++    parser.add_argument('--ci-union-null-padding', action='store_true',
++                        help='Only for published CI union columns; omit absent argument keys padded with null')
++    args = parser.parse_args()
++    args.output.mkdir(parents=True, exist_ok=False)
++    with args.input.open() as source, (args.output / 'data.jsonl').open('x') as target:
++        for line in source:
++            target.write(json.dumps(convert(json.loads(line), args.ci_union_null_padding), ensure_ascii=False) + '\n')
++    (args.output / 'dataset_info.json').write_text(json.dumps({'real': {
++        'file_name': 'data.jsonl', 'formatting': 'sharegpt',
++        'columns': {'messages': 'conversations', 'tools': 'tools'},
++    }}, indent=2) + '\n')
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/studies/native_lf/liger-ce-only.patch b/studies/native_lf/liger-ce-only.patch
+new file mode 100644
+index 0000000..7cbf6d8
+--- /dev/null
++++ b/studies/native_lf/liger-ce-only.patch
+@@ -0,0 +1,30 @@
++--- a/studies/native_lf/ci-native.yaml
+++++ b/studies/native_lf/ci-native.yaml
++@@ -24,7 +24,11 @@
++ seed: 42
++ data_seed: 42
++ flash_attn: fa2
++-enable_liger_kernel: true
+++enable_liger_kernel: false
+++use_liger_kernel: true
+++liger_kernel_config:
+++  rms_norm: false
+++  swiglu: false
++ deepspeed: examples/deepspeed/ds_z3_config.json
++ per_device_train_batch_size: 1
++ gradient_accumulation_steps: 8
++--- a/studies/native_lf/teacher-decision-native.yaml
+++++ b/studies/native_lf/teacher-decision-native.yaml
++@@ -27,7 +27,11 @@
++ seed: 42
++ data_seed: 42
++ flash_attn: fa2
++-enable_liger_kernel: true
+++enable_liger_kernel: false
+++use_liger_kernel: true
+++liger_kernel_config:
+++  rms_norm: false
+++  swiglu: false
++ deepspeed: /path/to/teacher-native-ds.json
++ per_device_train_batch_size: 1
++ gradient_accumulation_steps: 8
+diff --git a/studies/native_lf/teacher-decision-native.yaml b/studies/native_lf/teacher-decision-native.yaml
+new file mode 100644
+index 0000000..b16c4be
+--- /dev/null
++++ b/studies/native_lf/teacher-decision-native.yaml
+@@ -0,0 +1,42 @@
++# One raw provider decision per row; same recipe applies to MAX and OFF data.
++# Use export_teacher_lf.py to preserve fields through native ShareGPT.
++# Native labels/step grouping and default loss weighting differ from history.
++# Full CPU data passed; four real rows passed one partial-GA1 capacity update.
++# Full GA8/epoch remains untested; native allocator setting is required by recipe.
++model_name_or_path: /data/models/Qwen/Qwen3.5-4B
++model_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
++stage: sft
++do_train: true
++finetuning_type: full
++freeze_vision_tower: true
++freeze_multi_modal_projector: true
++freeze_language_model: false
++template: qwen3_5
++dataset: real
++dataset_dir: /path/to/new-teacher-decision-data
++output_dir: /path/to/new-teacher-native-output
++cutoff_len: 262144
++packing: false
++mask_history: true
++enable_thinking: true
++preserve_thinking: true
++bf16: true
++optim: adamw_torch
++gradient_checkpointing: true
++use_reentrant_gc: false
++seed: 42
++data_seed: 42
++flash_attn: fa2
++enable_liger_kernel: true
++deepspeed: /path/to/teacher-native-ds.json
++per_device_train_batch_size: 1
++gradient_accumulation_steps: 8
++learning_rate: 1.0e-5
++num_train_epochs: 1.0
++lr_scheduler_type: cosine_with_min_lr
++lr_scheduler_kwargs:
++  min_lr_rate: 0.1
++warmup_ratio: 0.05
++logging_steps: 1
++save_strategy: epoch
++report_to: none
+diff --git a/studies/native_lf/teacher-native-ds.json b/studies/native_lf/teacher-native-ds.json
+new file mode 100644
+index 0000000..67dce35
+--- /dev/null
++++ b/studies/native_lf/teacher-native-ds.json
+@@ -0,0 +1,39 @@
++{
++  "train_batch_size": "auto",
++  "train_micro_batch_size_per_gpu": "auto",
++  "gradient_accumulation_steps": "auto",
++  "gradient_clipping": "auto",
++  "zero_allow_untested_optimizer": true,
++  "fp16": {
++    "enabled": "auto",
++    "loss_scale": 0,
++    "loss_scale_window": 1000,
++    "initial_scale_power": 16,
++    "hysteresis": 2,
++    "min_loss_scale": 1
++  },
++  "bf16": {
++    "enabled": "auto"
++  },
++  "zero_optimization": {
++    "stage": 3,
++    "overlap_comm": false,
++    "contiguous_gradients": true,
++    "sub_group_size": 1000000000.0,
++    "reduce_bucket_size": "auto",
++    "stage3_prefetch_bucket_size": "auto",
++    "stage3_param_persistence_threshold": "auto",
++    "stage3_max_live_parameters": 50000000,
++    "stage3_max_reuse_distance": 0,
++    "stage3_gather_16bit_weights_on_model_save": true,
++    "offload_param": {
++      "device": "cpu",
++      "pin_memory": true
++    },
++    "offload_optimizer": {
++      "device": "cpu",
++      "pin_memory": true
++    }
++  },
++  "zero_force_ds_cpu_optimizer": false
++}
+diff --git a/studies/native_lf/teacher-token-mean.patch b/studies/native_lf/teacher-token-mean.patch
+new file mode 100644
+index 0000000..33c0946
+--- /dev/null
++++ b/studies/native_lf/teacher-token-mean.patch
+@@ -0,0 +1,26 @@
++--- a/train_one_epoch_cpu_forward_r9.py
+++++ b/train_one_epoch_cpu_forward_r9.py
++@@ -14,7 +14,6 @@
++ os.environ['QWEN35_STAGE']='verify-teacher-thinking-capacity'if spec['capacity']else 'teacher-thinking-'+spec['arm']
++ os.environ['QWEN35_JOB_ID']='teacher-thinking-'+spec['arm'];os.environ['QWEN35_CONFIG_SHA256']=hashlib.sha256(Path(cli.spec).read_bytes()).hexdigest()
++ sys.path.insert(0,spec['source_repository'])
++-from normalization import install
++ from transformers import TrainerCallback
++ from llamafactory.train.sft.trainer import CustomSeq2SeqTrainer
++ from llamafactory.train.tuner import run_exp
++@@ -24,7 +23,6 @@
++ from sft.runtime.eval_gather import preserve_loss_only_gather
++ from sft.qwen35 import digest
++ CustomSeq2SeqTrainer.evaluation_loop=preserve_loss_only_gather(CustomSeq2SeqTrainer.evaluation_loop)
++-install(CustomSeq2SeqTrainer,'token')
++ # Native PyTorch saves forward tensors to CPU; checkpoint recomputation/backward stays outside hook scope.
++ import functools,torch
++ _native_compute_loss=CustomSeq2SeqTrainer.compute_loss
++@@ -43,6 +41,7 @@
++   if keywords.get('labels')is not None and module.training:self.forward_batches[-1].update(input_sha256=s,labels_sha256=digest(labels))
++   return result
++  def on_train_begin(self,args,state,control,**kw):
+++  self.checkpoint_observer.trainer.model_accepts_loss_kwargs=True
++   result=super().on_train_begin(args,state,control,**kw)
++   measured=measure_data_parallel(self.checkpoint_observer.trainer.model_wrapped,__import__('torch').distributed)
++   assert measured['data_parallel_group_size']==4 and measured['effective_global_batch']==32
+diff --git a/studies/native_lf/token_mean.py b/studies/native_lf/token_mean.py
+new file mode 100644
+index 0000000..ae651fc
+--- /dev/null
++++ b/studies/native_lf/token_mean.py
+@@ -0,0 +1,14 @@
++"""Use Transformers' native global-token denominator with pinned LF/TF.
++
++LF disables loss kwargs whenever a processor exists. Qwen3.5's native and
++Liger causal losses both accept num_items_in_batch. CPU/DDP and bounded
++Qwen4B DP4/ZeRO3 GA8/GA2 controls verified; GPU differences are reported
++against same-mode repeat error. Teacher offload/long contexts remain untested.
++"""
++
++def enable_native_token_mean(trainer):
++    if trainer.compute_loss_func is not None:
++        raise ValueError('A custom compute_loss_func would change the objective')
++    if not trainer.args.average_tokens_across_devices:
++        raise ValueError('Global token mean requires average_tokens_across_devices')
++    trainer.model_accepts_loss_kwargs = True

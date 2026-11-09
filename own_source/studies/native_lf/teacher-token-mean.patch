@@ -1,0 +1,26 @@
+--- a/train_one_epoch_cpu_forward_r9.py
++++ b/train_one_epoch_cpu_forward_r9.py
+@@ -14,7 +14,6 @@
+ os.environ['QWEN35_STAGE']='verify-teacher-thinking-capacity'if spec['capacity']else 'teacher-thinking-'+spec['arm']
+ os.environ['QWEN35_JOB_ID']='teacher-thinking-'+spec['arm'];os.environ['QWEN35_CONFIG_SHA256']=hashlib.sha256(Path(cli.spec).read_bytes()).hexdigest()
+ sys.path.insert(0,spec['source_repository'])
+-from normalization import install
+ from transformers import TrainerCallback
+ from llamafactory.train.sft.trainer import CustomSeq2SeqTrainer
+ from llamafactory.train.tuner import run_exp
+@@ -24,7 +23,6 @@
+ from sft.runtime.eval_gather import preserve_loss_only_gather
+ from sft.qwen35 import digest
+ CustomSeq2SeqTrainer.evaluation_loop=preserve_loss_only_gather(CustomSeq2SeqTrainer.evaluation_loop)
+-install(CustomSeq2SeqTrainer,'token')
+ # Native PyTorch saves forward tensors to CPU; checkpoint recomputation/backward stays outside hook scope.
+ import functools,torch
+ _native_compute_loss=CustomSeq2SeqTrainer.compute_loss
+@@ -43,6 +41,7 @@
+   if keywords.get('labels')is not None and module.training:self.forward_batches[-1].update(input_sha256=s,labels_sha256=digest(labels))
+   return result
+  def on_train_begin(self,args,state,control,**kw):
++  self.checkpoint_observer.trainer.model_accepts_loss_kwargs=True
+   result=super().on_train_begin(args,state,control,**kw)
+   measured=measure_data_parallel(self.checkpoint_observer.trainer.model_wrapped,__import__('torch').distributed)
+   assert measured['data_parallel_group_size']==4 and measured['effective_global_batch']==32

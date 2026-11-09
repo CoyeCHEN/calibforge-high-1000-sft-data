@@ -1,0 +1,20 @@
+{
+  "rule": "Stop after the last real assistant decision; trailing tool feedback has no subsequent target.",
+  "assistant_messages_removed": 0,
+  "rows": {
+    "train": {
+      "rows": 638,
+      "trajectories_with_terminal_tool_feedback_removed": 504,
+      "terminal_tool_messages_removed": 504,
+      "assistant_targets_preserved": 16999,
+      "sha256": "50a0fbd81db5f42a673aff2a6f7684dec542582443a387e6fb94592044ab1a87"
+    },
+    "validation": {
+      "rows": 35,
+      "trajectories_with_terminal_tool_feedback_removed": 25,
+      "terminal_tool_messages_removed": 25,
+      "assistant_targets_preserved": 1070,
+      "sha256": "622cfae6af76cd1554a6c03134504ee893b2be48a4a272df6fc9f6677e378307"
+    }
+  }
+}

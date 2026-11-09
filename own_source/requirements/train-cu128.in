@@ -1,0 +1,13 @@
+# The lock records the actual isolated A800 environment. Install Torch first;
+# flash-attn / causal-conv1d builds require matching CUDA and the C++11 ABI.
+-c train-cu128.lock
+llamafactory @ git+https://github.com/hiyouga/LLaMA-Factory.git@c683e59edd8f893abc5e1403184a1d0644817d2a
+torch==2.8.0
+transformers==5.8.0
+deepspeed==0.19.8
+accelerate==1.11.0
+datasets==4.0.0
+flash-attn==2.8.3
+causal-conv1d==1.6.0
+flash-linear-attention==0.5.2
+liger-kernel==0.8.4
