@@ -7,8 +7,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6657,
-      "sha256": "37d7561c4db269bd40759ae6cf194cce1283799de58240b185e222abb7e9753d"
+      "bytes": 8442,
+      "sha256": "d19f9a9284d7b6c1fcd2e506c01575c6be4a864cecda0889dc8c4df63ff7760e"
     },
     {
       "path": "REPRODUCE_CPU.sh",
@@ -27,8 +27,8 @@
     },
     {
       "path": "configs/train-native.yaml",
-      "bytes": 1424,
-      "sha256": "9e3c32c680448ad13f98858ed620eb14c01ef6917cd6d6e6df3e844348bed345"
+      "bytes": 1498,
+      "sha256": "22c27f854aa4e05a3b622f12d5d0ba49c760d23cb1ff02fabacdaca9bebd88b7"
     },
     {
       "path": "data/EXPORT_REPORT.json",
@@ -1271,9 +1271,14 @@
       "sha256": "bbea39f6ba173357e75e01c8f739f87d784329182e9e1682faecf9578ef619d6"
     },
     {
+      "path": "metadata/BASELINE_03074a8.json",
+      "bytes": 1923,
+      "sha256": "a45ff33541db247861e41ada1cf8c11775b564368e7fa134c669d45c0de0c66b"
+    },
+    {
       "path": "metadata/DATA_MANIFEST.json",
-      "bytes": 1277,
-      "sha256": "ae3ed1137692423ddb9d5e0881d82f5ba1ffa0e52dc237f9a86bd139d18f217f"
+      "bytes": 1415,
+      "sha256": "ccf619247e21a3fbe54ac94081c7356c444d226a01e4070b6b8d28a8b90e6a92"
     },
     {
       "path": "metadata/EXPORT_REPORT.json",
@@ -1288,17 +1293,22 @@
     {
       "path": "metadata/OWN_CHANGES.patch",
       "bytes": 54803,
-      "sha256": "e0736f525388a7e69c09b6f0ae56fd4a1728e5a3355afe6d3aeb68ccbaa1de25"
+      "sha256": "8768e2d4b8a51968339e2c1f256c210c09cdeb05e345777e733d198df2c8b5dd"
     },
     {
       "path": "metadata/OWN_SOURCE_MANIFEST.json",
-      "bytes": 13758,
-      "sha256": "b807ee12474e70059f3b91afdfe061f1415c007bb85dc2980203162c45b2c1ab"
+      "bytes": 14008,
+      "sha256": "ca70009f871c6c11f2fdc5526600f83fd203d7d35fd5a01e3858facb3e5bb8c3"
     },
     {
       "path": "metadata/RAW_RECORDER_INDEX.json",
       "bytes": 233306,
       "sha256": "2157a20db0ed227c721dfdd20f6b02afe1cc43efde7f74a6d42c8c8d6021b3ee"
+    },
+    {
+      "path": "metadata/REFRESH_VALIDATION.json",
+      "bytes": 804,
+      "sha256": "5112dc290c36cdd95cdcd059b312c879924b53fc6117fa67ba86f384d7f71471"
     },
     {
       "path": "metadata/RESULT.json",
@@ -1319,6 +1329,11 @@
       "path": "metadata/TERMINAL_FEEDBACK_REGRESSION.json",
       "bytes": 513,
       "sha256": "ac4a8a1da35ce3bec733517a8e49ece4257feeca95615f258ef85606559c58a8"
+    },
+    {
+      "path": "metadata/TRAIN_CONFIG_AUDIT.json",
+      "bytes": 14964,
+      "sha256": "78fc6eece5b9a1fad2da519c645fdf5630112428c037bcb66f22c3b90aa2b418"
     },
     {
       "path": "metadata/train-row-hashes.jsonl",
@@ -2009,6 +2024,11 @@
       "path": "runtime-tokenizer/tokenizer_config.json",
       "bytes": 1151,
       "sha256": "6afb788a36dfea1f5e6664cc9867ac6c39eb26b18ea338717825cf28ef444290"
+    },
+    {
+      "path": "scripts/check_package.py",
+      "bytes": 3445,
+      "sha256": "1c87279e03f564c9a2c060846df24aee6baf05428d9cf706e3c62f3a6641b4c8"
     },
     {
       "path": "scripts/export_from_raw.py",

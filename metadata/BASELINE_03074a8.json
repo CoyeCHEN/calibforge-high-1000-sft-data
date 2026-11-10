@@ -1,0 +1,37 @@
+{
+  "package_version": "native-lf-v2",
+  "source_snapshot_commit": "03074a83743c70394d59b4e17b07a0b122495e54",
+  "source_parent_commit": "7d78bf219410e37f0bd36547263c2c7c694aada6",
+  "source_branch": "study/sds-fixed-legacy-20261110",
+  "frozen_from_branch": "audit/native-lf-simplification-20261109",
+  "lf_commit": "c683e59edd8f893abc5e1403184a1d0644817d2a",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "included_own_source_files": 122,
+  "previous_122_files_already_equal_pinned_commit": true,
+  "active_training_entry": "torchrun --nproc_per_node=4 framework/LLaMAFactory/src/train.py configs/train-native.yaml",
+  "active_data_entry": "scripts/export_from_raw.py -> own_source/studies/native_lf/export_teacher_lf.py -> native LF preprocessing",
+  "epochs": 5,
+  "train_rows": 638,
+  "validation_rows": 35,
+  "expected_dp_world_size": 4,
+  "microbatch_per_rank": 1,
+  "gradient_accumulation_steps": 8,
+  "nominal_effective_batch": 32,
+  "expected_optimizer_steps_per_epoch": 20,
+  "expected_optimizer_steps_total": 100,
+  "step_counts_scope": "Expected from native DP4 sampling and completed five epochs, not observed training results",
+  "expected_sampled_rows_per_epoch_with_dp_padding": 640,
+  "expected_sampled_rows_over_five_epochs": 3200,
+  "runtime_overrides_from_source_examples": [
+    "whole trajectory rows, fixed CalibForge split, five epochs",
+    "existing package terminal-tool-feedback trimming and text-only media placeholder environment are retained"
+  ],
+  "ci_fixes_included_but_not_called_by_calibforge_entry": [
+    "full SGLang _process_messages tool projection and projection identity check",
+    "remove cross-root cache reuse and record actual tokenizer assets",
+    "preserve checkpoint tokenizer during CI export instead of M0 override"
+  ],
+  "data_and_labels_changed": false,
+  "historical_configs_changed": false,
+  "gpu_training_executed_for_this_refresh": false
+}

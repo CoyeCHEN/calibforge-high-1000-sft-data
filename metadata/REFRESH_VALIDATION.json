@@ -1,0 +1,17 @@
+{
+  "status": "PASSED",
+  "source_snapshot_commit": "03074a83743c70394d59b4e17b07a0b122495e54",
+  "own_source_files_equal_pinned_commit": 122,
+  "unchanged_published_data_model_framework_source_files": 383,
+  "all_original_raw_data_and_cached_tensors_unchanged": true,
+  "historical_configs_unchanged": true,
+  "active_recipe_semantic_changes": [
+    "num_train_epochs",
+    "output_dir"
+  ],
+  "explicit_fields_equal_locked_defaults": true,
+  "changed_text_credential_pattern_candidates": 0,
+  "credential_scan_scope": "Changed/new text files; unchanged published data bytes checked against the original package manifest",
+  "gpu_training_executed": false,
+  "raw_to_tensor_processing_not_repeated": "No data/encoding/template source change; original CPU receipts retained with exact file identities"
+}

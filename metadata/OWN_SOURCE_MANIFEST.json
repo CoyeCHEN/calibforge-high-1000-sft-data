@@ -1,5 +1,5 @@
 {
-  "branch": "audit/native-lf-simplification-20261109",
+  "branch": "study/sds-fixed-legacy-20261110",
   "base_commit": "7d78bf219410e37f0bd36547263c2c7c694aada6",
   "files": {
     "README.md": "babb071d0afa198131cae162372dd7afd1935bab207f856c61ef0c30ea4ab9a1",
@@ -124,5 +124,8 @@
     "studies/native_lf/teacher-native-ds.json": "4260d163c82e11d357d7f53e8d1437e6ea20b3a1d93436e397bf380a928aaff9",
     "studies/native_lf/teacher-token-mean.patch": "008d976e7780c3a46eb18ac6b3745a972251d1ab407c3dbeb814ff1f8c8fe405",
     "studies/native_lf/token_mean.py": "908884763f6eae6a81c0c824d16a8c464a9b11037b61356d43a11d00920b7a7f"
-  }
+  },
+  "source_snapshot_commit": "03074a83743c70394d59b4e17b07a0b122495e54",
+  "frozen_from_branch": "audit/native-lf-simplification-20261109",
+  "snapshot_scope": "Included own_source files equal this exact committed baseline; subsequent SDS adapters excluded"
 }

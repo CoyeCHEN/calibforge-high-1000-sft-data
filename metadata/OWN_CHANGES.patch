@@ -479,32 +479,6 @@ index eaf2547..9290d85 100644
      callback.cutoff=cfg['cutoff_len']
      callback.runtime_recipe='ci_public_positive_control'
      callback.checkpoint_observer=CheckpointObserver(callback,optimizer_evidence,archive_enabled=False).install()
-diff --git a/tests/test_checkpoint_observer.py b/tests/test_checkpoint_observer.py
-index 5728924..6a5cda9 100644
---- a/tests/test_checkpoint_observer.py
-+++ b/tests/test_checkpoint_observer.py
-@@ -44,15 +44,19 @@ class SaveBoundary(unittest.TestCase):
-             trainer=SimpleNamespace(state=SimpleNamespace(global_step=1,is_world_process_zero=True),
-                 args=SimpleNamespace(output_dir=temp),model=object(),model_wrapped=object(),optimizer=object(),lr_scheduler=scheduler)
-             callback=SimpleNamespace(selected=[('weight',None)],weight=lambda value:'fixed-master-hash',
--                                     record=lambda event,state,**data:events.append(dict(event=event,**data)))
-+                                     record=lambda event,state,**data:events.append(dict(event=event,**data)),
-+                                     runtime_recipe='agent_sft_v1')
-             observer=CheckpointObserver(callback,lambda optimizer:{'Adam':'fixed'})
-             def train(instance,*args,**kwargs):return None
-             def save(instance,*args,**kwargs):fixture(folder)
-             def last_callback(handler,args,state,control):
-                 (folder/'late-processor.json').write_text('{}')
-                 return control
-+            native_identity=observer.identity
-+            # The CPU fixture contains four rank shards; no distributed run is claimed.
-             with patch.object(Trainer,'train',train),patch.object(Trainer,'_save_checkpoint',save),\
--                 patch.object(CallbackHandler,'on_save',last_callback):
-+                 patch.object(CallbackHandler,'on_save',last_callback),\
-+                 patch.object(observer,'identity',lambda:{**native_identity(),'world_size':4}):
-                 observer.install()
-                 Trainer.train(trainer)
-                 Trainer._save_checkpoint(trainer)
 diff --git a/studies/native_lf/README.txt b/studies/native_lf/README.txt
 new file mode 100644
 index 0000000..4b15595
@@ -979,3 +953,29 @@ index 0000000..ae651fc
 +    if not trainer.args.average_tokens_across_devices:
 +        raise ValueError('Global token mean requires average_tokens_across_devices')
 +    trainer.model_accepts_loss_kwargs = True
+diff --git a/tests/test_checkpoint_observer.py b/tests/test_checkpoint_observer.py
+index 5728924..6a5cda9 100644
+--- a/tests/test_checkpoint_observer.py
++++ b/tests/test_checkpoint_observer.py
+@@ -44,15 +44,19 @@ class SaveBoundary(unittest.TestCase):
+             trainer=SimpleNamespace(state=SimpleNamespace(global_step=1,is_world_process_zero=True),
+                 args=SimpleNamespace(output_dir=temp),model=object(),model_wrapped=object(),optimizer=object(),lr_scheduler=scheduler)
+             callback=SimpleNamespace(selected=[('weight',None)],weight=lambda value:'fixed-master-hash',
+-                                     record=lambda event,state,**data:events.append(dict(event=event,**data)))
++                                     record=lambda event,state,**data:events.append(dict(event=event,**data)),
++                                     runtime_recipe='agent_sft_v1')
+             observer=CheckpointObserver(callback,lambda optimizer:{'Adam':'fixed'})
+             def train(instance,*args,**kwargs):return None
+             def save(instance,*args,**kwargs):fixture(folder)
+             def last_callback(handler,args,state,control):
+                 (folder/'late-processor.json').write_text('{}')
+                 return control
++            native_identity=observer.identity
++            # The CPU fixture contains four rank shards; no distributed run is claimed.
+             with patch.object(Trainer,'train',train),patch.object(Trainer,'_save_checkpoint',save),\
+-                 patch.object(CallbackHandler,'on_save',last_callback):
++                 patch.object(CallbackHandler,'on_save',last_callback),\
++                 patch.object(observer,'identity',lambda:{**native_identity(),'world_size':4}):
+                 observer.install()
+                 Trainer.train(trainer)
+                 Trainer._save_checkpoint(trainer)

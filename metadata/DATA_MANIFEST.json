@@ -5,7 +5,7 @@
   "validation_rows": 35,
   "credential_candidate_trajectories_excluded": 17,
   "raw_long_trajectory_not_in_train_or_validation": 1,
-  "source_branch": "audit/native-lf-simplification-20261109",
+  "source_branch": "study/sds-fixed-legacy-20261110",
   "source_base_commit": "7d78bf219410e37f0bd36547263c2c7c694aada6",
   "lf_commit": "c683e59edd8f893abc5e1403184a1d0644817d2a",
   "active_exporter_sha256": "8feee019ab770a7c0349ae45d3c17210880fd11204ae2542e0a90dfcfe17a773",
@@ -29,5 +29,7 @@
   },
   "source_raw_aggregation_sha256": "3f94c6b1fc6b70bf1f50a08fd497dfbd9ccee256501ec217ed2f347c24b90d19",
   "published_raw_sha256": "f465a4ea8dd7587477e375b2942ecc71c83330fc6e380ea43a0088726aad67b7",
-  "scope": "new native LF processing of the same raw collection, not historical training-cache equivalence"
+  "scope": "new native LF processing of the same raw collection, not historical training-cache equivalence",
+  "source_snapshot_commit": "03074a83743c70394d59b4e17b07a0b122495e54",
+  "source_frozen_from_branch": "audit/native-lf-simplification-20261109"
 }

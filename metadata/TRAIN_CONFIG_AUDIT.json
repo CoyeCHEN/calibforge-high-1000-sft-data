@@ -1,0 +1,478 @@
+{
+  "checked_at": "2026-11-10T02:52:50.669638+00:00",
+  "scope": "All active YAML fields reviewed; historical772_M1 is a recipe reference with different data, not the same CalibForge run",
+  "changes": [
+    {
+      "field": "adam_beta1",
+      "previous_explicit_value": null,
+      "new_value": 0.9,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 0.9,
+      "historical772_M1_reference_value": 0.9
+    },
+    {
+      "field": "adam_beta2",
+      "previous_explicit_value": null,
+      "new_value": 0.999,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 0.999,
+      "historical772_M1_reference_value": 0.999
+    },
+    {
+      "field": "adam_epsilon",
+      "previous_explicit_value": null,
+      "new_value": 1e-08,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 1e-08,
+      "historical772_M1_reference_value": 1e-08
+    },
+    {
+      "field": "dataloader_drop_last",
+      "previous_explicit_value": null,
+      "new_value": false,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": null
+    },
+    {
+      "field": "load_best_model_at_end",
+      "previous_explicit_value": null,
+      "new_value": false,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "max_grad_norm",
+      "previous_explicit_value": null,
+      "new_value": 1.0,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 1.0,
+      "historical772_M1_reference_value": 1.0
+    },
+    {
+      "field": "num_train_epochs",
+      "previous_explicit_value": 1.0,
+      "new_value": 5.0,
+      "change": "changed",
+      "locked_TF5_8_declared_default": 3.0,
+      "historical772_M1_reference_value": 5.0
+    },
+    {
+      "field": "output_dir",
+      "previous_explicit_value": "outputs/calibforge-high-native",
+      "new_value": "outputs/calibforge-high-native-e5",
+      "change": "changed",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "/ssd/chenkeyi/qwen35-sft-772-20261101/runs/new-m1-cf416-128k-e5"
+    },
+    {
+      "field": "save_only_model",
+      "previous_explicit_value": null,
+      "new_value": false,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "weight_decay",
+      "previous_explicit_value": null,
+      "new_value": 0.0,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 0.0,
+      "historical772_M1_reference_value": 0.0
+    }
+  ],
+  "all_fields": [
+    {
+      "field": "adam_beta1",
+      "previous_explicit_value": null,
+      "new_value": 0.9,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 0.9,
+      "historical772_M1_reference_value": 0.9
+    },
+    {
+      "field": "adam_beta2",
+      "previous_explicit_value": null,
+      "new_value": 0.999,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 0.999,
+      "historical772_M1_reference_value": 0.999
+    },
+    {
+      "field": "adam_epsilon",
+      "previous_explicit_value": null,
+      "new_value": 1e-08,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 1e-08,
+      "historical772_M1_reference_value": 1e-08
+    },
+    {
+      "field": "bf16",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "cutoff_len",
+      "previous_explicit_value": 262144,
+      "new_value": 262144,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": 131072
+    },
+    {
+      "field": "data_seed",
+      "previous_explicit_value": 42,
+      "new_value": 42,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": 42
+    },
+    {
+      "field": "dataloader_drop_last",
+      "previous_explicit_value": null,
+      "new_value": false,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": null
+    },
+    {
+      "field": "dataset",
+      "previous_explicit_value": "calibforge_high_train",
+      "new_value": "calibforge_high_train",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "new-cf416-m1"
+    },
+    {
+      "field": "dataset_dir",
+      "previous_explicit_value": "data",
+      "new_value": "data",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": null
+    },
+    {
+      "field": "deepspeed",
+      "previous_explicit_value": "configs/native-ds.json",
+      "new_value": "configs/native-ds.json",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "/ssd/chenkeyi/qwen35-sft-772-20261101/new-sft/workspace/configs/ds_z3.json"
+    },
+    {
+      "field": "do_eval",
+      "previous_explicit_value": false,
+      "new_value": false,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "do_train",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "enable_liger_kernel",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "enable_thinking",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "eval_dataset",
+      "previous_explicit_value": "calibforge_high_validation",
+      "new_value": "calibforge_high_validation",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "new-cf416-m1-validation"
+    },
+    {
+      "field": "finetuning_type",
+      "previous_explicit_value": "full",
+      "new_value": "full",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "full"
+    },
+    {
+      "field": "flash_attn",
+      "previous_explicit_value": "fa2",
+      "new_value": "fa2",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "fa2"
+    },
+    {
+      "field": "freeze_language_model",
+      "previous_explicit_value": false,
+      "new_value": false,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "freeze_multi_modal_projector",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "freeze_vision_tower",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "gradient_accumulation_steps",
+      "previous_explicit_value": 8,
+      "new_value": 8,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": 1,
+      "historical772_M1_reference_value": 8
+    },
+    {
+      "field": "gradient_checkpointing",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "learning_rate",
+      "previous_explicit_value": 1e-05,
+      "new_value": 1e-05,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": 5e-05,
+      "historical772_M1_reference_value": 1e-05
+    },
+    {
+      "field": "load_best_model_at_end",
+      "previous_explicit_value": null,
+      "new_value": false,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "logging_steps",
+      "previous_explicit_value": 1,
+      "new_value": 1,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": 500,
+      "historical772_M1_reference_value": 1
+    },
+    {
+      "field": "lr_scheduler_kwargs",
+      "previous_explicit_value": {
+        "min_lr_rate": 0.1
+      },
+      "new_value": {
+        "min_lr_rate": 0.1
+      },
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": {
+        "min_lr_rate": 0.1
+      }
+    },
+    {
+      "field": "lr_scheduler_type",
+      "previous_explicit_value": "cosine_with_min_lr",
+      "new_value": "cosine_with_min_lr",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": "linear",
+      "historical772_M1_reference_value": "cosine_with_min_lr"
+    },
+    {
+      "field": "mask_history",
+      "previous_explicit_value": false,
+      "new_value": false,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "max_grad_norm",
+      "previous_explicit_value": null,
+      "new_value": 1.0,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 1.0,
+      "historical772_M1_reference_value": 1.0
+    },
+    {
+      "field": "model_name_or_path",
+      "previous_explicit_value": "Qwen/Qwen3.5-4B",
+      "new_value": "Qwen/Qwen3.5-4B",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "/ssd/chenkeyi/qwen35-sft-772-20261101/assets/source17-r1/student-tokenizer"
+    },
+    {
+      "field": "model_revision",
+      "previous_explicit_value": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "new_value": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+    },
+    {
+      "field": "num_train_epochs",
+      "previous_explicit_value": 1.0,
+      "new_value": 5.0,
+      "change": "changed",
+      "locked_TF5_8_declared_default": 3.0,
+      "historical772_M1_reference_value": 5.0
+    },
+    {
+      "field": "optim",
+      "previous_explicit_value": "adamw_torch",
+      "new_value": "adamw_torch",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "adamw_torch"
+    },
+    {
+      "field": "output_dir",
+      "previous_explicit_value": "outputs/calibforge-high-native",
+      "new_value": "outputs/calibforge-high-native-e5",
+      "change": "changed",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "/ssd/chenkeyi/qwen35-sft-772-20261101/runs/new-m1-cf416-128k-e5"
+    },
+    {
+      "field": "packing",
+      "previous_explicit_value": false,
+      "new_value": false,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "per_device_train_batch_size",
+      "previous_explicit_value": 1,
+      "new_value": 1,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": 8,
+      "historical772_M1_reference_value": 1
+    },
+    {
+      "field": "preserve_thinking",
+      "previous_explicit_value": true,
+      "new_value": true,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": true
+    },
+    {
+      "field": "report_to",
+      "previous_explicit_value": "none",
+      "new_value": "none",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": "none",
+      "historical772_M1_reference_value": "none"
+    },
+    {
+      "field": "save_only_model",
+      "previous_explicit_value": null,
+      "new_value": false,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": false,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "save_strategy",
+      "previous_explicit_value": "epoch",
+      "new_value": "epoch",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": "steps",
+      "historical772_M1_reference_value": "epoch"
+    },
+    {
+      "field": "seed",
+      "previous_explicit_value": 42,
+      "new_value": 42,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": 42,
+      "historical772_M1_reference_value": 42
+    },
+    {
+      "field": "stage",
+      "previous_explicit_value": "sft",
+      "new_value": "sft",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "sft"
+    },
+    {
+      "field": "template",
+      "previous_explicit_value": "qwen3_5",
+      "new_value": "qwen3_5",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "qwen3_5"
+    },
+    {
+      "field": "tokenized_path",
+      "previous_explicit_value": "data/lf-cache",
+      "new_value": "data/lf-cache",
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": "/ssd/chenkeyi/qwen35-sft-772-20261101/frozen-data-772-r3/calibforge/cache-131072"
+    },
+    {
+      "field": "use_reentrant_gc",
+      "previous_explicit_value": false,
+      "new_value": false,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": false
+    },
+    {
+      "field": "warmup_ratio",
+      "previous_explicit_value": 0.05,
+      "new_value": 0.05,
+      "change": "unchanged",
+      "locked_TF5_8_declared_default": null,
+      "historical772_M1_reference_value": 0.05
+    },
+    {
+      "field": "weight_decay",
+      "previous_explicit_value": null,
+      "new_value": 0.0,
+      "change": "explicit_existing_default",
+      "locked_TF5_8_declared_default": 0.0,
+      "historical772_M1_reference_value": 0.0
+    }
+  ],
+  "unchanged_other_config_files": [
+    "configs/native-ds.json",
+    "configs/native-text.env"
+  ],
+  "data_and_cached_tensor_files_changed": false,
+  "declared_default_source": "Transformers5.8.0 training_args.py",
+  "declared_default_source_sha256": "a563d137f3a388375fd97607702c0b47432b54cc53b52b63c5414a54fecb802d",
+  "training_executed": false
+}
